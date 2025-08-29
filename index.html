@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.16</title>
+  <title>NÁVEX v.0.20</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -273,6 +273,33 @@
 			color: #aaa;
 		}
 
+		#achievementsOverlay .grid > div:nth-child(-n+6) {
+			border-bottom: 1px solid #666;
+			padding-bottom: 4px;
+		}
+
+		#ver-logros, #ver-logros-victoria {
+			transition: background-color 0.2s ease;
+		}
+
+		.scrollable-content {
+			max-height: 90vh;
+			overflow-y: auto;
+			padding-right: 1rem; /* espacio para la barra */
+		}
+		.scrollable-content::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.scrollable-content::-webkit-scrollbar-thumb {
+			background-color: #888;
+			border-radius: 4px;
+		}
+		.scrollable-content::-webkit-scrollbar-thumb:hover {
+			background-color: #555;
+		}
+
+
   	</style>
 </head>
 
@@ -328,31 +355,87 @@
 							<kbd class="key-badge">←</kbd> / <kbd class="key-badge">↑</kbd> / <kbd class="key-badge">→</kbd>
 						</span>
 						<span class="controls-desc">Elegir respuesta a las preguntas</span>
-					</div>
+					</div>				
+					<hr class="my-4 border-gray-600">
+					<p class="text-xl text-gray-300 mb-2 text-center">
+					OBJETIVO: Destruyen enemigos y recolecta objetos para alcanzar la puntuación del nivel.
+					</p>
+
 				</div>
 				<button onclick="hideControls()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
 			</div>
 		</div>
 
 		<!-- >>>>>> OVERLAY LOGROS <<<<<< -->
-		<div id="achievementsOverlay" class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-64">
-			<h2 class="text-xl mb-4">Logros</h2>
-			<p>Próximamente: tus records y medallas.</p>
-			<button onclick="hideAchievements()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
+		<div id="achievementsOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  			<div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">
+				<h2 class="text-xl mb-4 text-center">RÉCORDS</h2>
+
+				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
+					<!-- Fila 1:  Encabezado -->
+					<div></div> <!-- celda vacía -->
+					<div class="font-semibold">Tiempo</div>
+					<div class="font-semibold">Preguntas</div>
+					<div class="font-semibold">Aciertos</div>
+					<div class="font-semibold">Fallos</div>
+					<div class="font-semibold">Nivel</div>
+
+					<!-- Fila 2: Última partida -->
+					<div class="font-semibold  whitespace-nowrap">Última partida</div>
+					<div id="achvTime">—:—</div>
+					<div id="achvAnswers">0</div>
+					<div id="achvCorrects">0 (0%)</div>
+					<div id="achvFails">0 (0%)</div>
+					<div id="achvLevel">—</div>
+
+					<!-- Fila 3: Mejor tiempo -->
+					<div id="recBestTimeName"></div>
+					<div id="recBestTimeTime"><strong>—:—</strong></div>
+					<div id="recBestTimeQuestions">—</div>
+					<div id="recBestTimeCorrects">—</div>
+					<div id="recBestTimeFails">—</div>
+					<div id="recBestTimeLevel">—</div>
+
+					<!-- Fila 4: Más aciertos -->
+					<div id="recBestCorrName"></div>
+					<div id="recBestCorrTime">—:—</div>
+					<div id="recBestCorrQuestions">—</div>
+					<div id="recBestCorrCorrects"><strong>—</strong></div>
+					<div id="recBestCorrFails">—</div>
+					<div id="recBestCorrLevel">—</div>
+				</div>
+
+				<br>
+				<h2 class="text-xl mb-4 text-center">LOGROS</h2>
+
+				<div id="medallas" class="mt-6 space-y-4">
+					<div class="flex items-center">
+						<img id="medalla-aciertos_10" src="" alt="medalla-aciertos_10" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 10 preguntas.</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-aciertos_25" src="" alt="medalla-aciertos25" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 25 preguntas SIN fallar ninguna</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-aciertos_50" src="" alt="medalla-aciertos_50" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 50 preguntas.</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-veloz" src="" alt="medalla-veloz" class="w-12 h-12 mr-4">
+						<span>Completa el juego en menos de 10 minutos</span>
+					</div>
+				</div>
+
+				<button onclick="hideAchievements()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">
+					Volver
+				</button>
 			</div>
 		</div>
 
 
 		<!-- HUD -->
 		<div id="hud">
-			<!-- <div class="row1">
-				<div id="lives"></div>
-				<div>
-					<div id="score"></div>
-					<div id="levelIndicator"></div>
-				</div>
-			</div>-->
 			<div class="row1">
 				<div id="lives"></div>
 				<div id="scoreLevel" style="display:flex; gap:12px; align-items:center;">
@@ -395,6 +478,7 @@
 			<div>¡Juego terminado!</div>
 			<div id="endStats" class="stats"></div>
 			<button id="restartBtn">Volver a empezar</button>
+			<button id="ver-logros" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
   			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
@@ -403,6 +487,7 @@
 			<div>🎉 ¡Has ganado!</div>
 			<div id="endStatsWin" class="stats"></div>
 			<button id="restartWinBtn">Volver a empezar</button>
+			<button id="ver-logros-victoria" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
 			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
@@ -422,6 +507,9 @@
   	</div>
 
   	<script>
+		// DEBUG
+		let inmortal = false;
+
 		// ===== Carga de imágenes =====
 		const playerImage     = new Image();
 		playerImage.src       = "Imágenes/nave.png";
@@ -453,6 +541,61 @@
 		absorberSatImage.src = "Imágenes/Satélite3b.png";
 		const mirrorImage = new Image();
 		mirrorImage.src   = "Imágenes/naveEspejo.png";
+		const imagePaths = {
+			medallas: {
+				aciertos_10: "Imágenes/medalla02.png",
+				aciertos_25: "Imágenes/medalla01.png",
+				aciertos_50: "Imágenes/medalla05.png",
+				veloz: "Imágenes/medalla07.png"
+			}
+		};
+		let medallasEstado = {
+			aciertos_10: false,
+			aciertos_25: false,
+			aciertos_50: false,
+			veloz: false
+		};
+
+		// Cargar logros conseguidos desde localStorage si existe
+		const guardado = localStorage.getItem("medallasEstado");
+		if (guardado) {
+			try {
+				medallasEstado = JSON.parse(guardado);
+			} catch (e) {
+				console.warn("Error al cargar medallas guardadas:", e);
+			}
+		}
+		let bestTimeRecord = JSON.parse(localStorage.getItem("bestTimeRecord")) || null;
+		let bestCorrectsRecord = JSON.parse(localStorage.getItem("bestCorrectsRecord")) || null;
+		// Records por defecto si aún no hay ninguno
+		if (!bestTimeRecord) {
+			bestTimeRecord = {
+				name: "TORTUGA",
+				stats: {
+					timeSec: 1818,         // tiempo alto para que sea fácil de superar
+					answers: 0,
+					corrects: 0,
+					correctPct: 0,
+					fails: 0,
+					failPct: 0,
+					level: 11
+				}
+			};
+		}
+		if (!bestCorrectsRecord) {
+			bestCorrectsRecord = {
+				name: "Listillo",
+				stats: {
+					timeSec: 652,
+					answers: 0,
+					corrects: 3,
+					correctPct: 60,
+					fails: 2,
+					failPct: 40,
+					level: 3
+				}
+			};
+		}
 
 		// Audio
 		let muted = true;// Empezamos con el sonido apagado
@@ -481,6 +624,7 @@
 		const rockSpeed  = 3;
 		const bulletSpeed = 7;
 		let extraLives = 0;   // 0–3, solo se llena en Nivel 11
+		let gameWon = false		// Bandera para indicar si se ha acabado el último nivel
 
 		let currentLevel = 0;
 		const levels = [
@@ -748,6 +892,17 @@
 		const btnAchievements   = document.getElementById("btnAchievements");
 		const btnBackToMenu     = document.querySelectorAll("#btnMenu"); // gameOver + win
 
+		let lastRun = {
+			level: 0,
+			timeSec: 0,
+			answers: 0,
+			corrects: 0,
+			fails: 0,
+			correctPct: 0,
+			failPct: 0
+		};
+
+
 		// ===== MENÚ =====
 		// Ocultar/mostrar helpers
 		function showMainMenu() {
@@ -765,7 +920,13 @@
 		}
 		function showControls() { controlsOverlay.classList.remove("hidden"); }
 		function hideControls() { controlsOverlay.classList.add("hidden"); }
-		function showAchievements() { achievementsOverlay.classList.remove("hidden"); }
+		function showAchievements() { 
+			captureLastRun();   
+  			checkRecords();
+			updateAchievementsOverlay();
+			actualizarMedallas();
+			achievementsOverlay.classList.remove("hidden"); 
+		}
 		function hideAchievements() { achievementsOverlay.classList.add("hidden"); }
 
 		// Botones del menú
@@ -2566,7 +2727,11 @@
 				scoreGoal = levels[currentLevel].goal;
 				updateHUD();
 				showLevelOverlay();
-			}
+			};
+
+			if(e.code==="KeyI") {
+				inmortal = !inmortal;
+			};
 			// -------------------------
 			
 			keys[e.code] = true;
@@ -2746,10 +2911,35 @@
 		// ===== Pantallas de fin de juego =====
 		function showGameOver(){
 			gameRunning = false;
+			captureLastRun();	// Graba los resultados de esta partida
+			checkRecords(); 
+			checkAchivements();	// Comprueba si se ha obtenido algún logro
+			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
+
+			//Datos por pantalla:
 			document.getElementById("endStats").textContent =
 				`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 			document.getElementById("gameOverScreen").style.display = "flex";
+			document.getElementById("ver-logros").onclick = () => { showAchievements();	};
 		}
+
+		function showWin(){
+			gameRunning = false;
+		
+			captureLastRun();	// Graba los resultados de esta partida
+			checkRecords(); 
+			checkAchivements();	// Comprueba si se ha obtenido algún logro
+			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
+
+			//Datos por pantalla:
+			document.getElementById("endStatsWin").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("winScreen").classList.add("win");
+			document.getElementById("winScreen").style.display = "flex";
+			document.getElementById("ver-logros-victoria").onclick = () => { showAchievements();	};
+
+			startCelebration();
+		}
+
 		function resizeCanvas() {
 			confettiCanvas.width  = canvas.width;
 			confettiCanvas.height = canvas.height;
@@ -2838,15 +3028,6 @@
 			fireworks = [];
 			confettiParticles = [];
 			victoryMusic.pause();
-		}
-
-		function showWin(){
-			gameRunning = false;
-			document.getElementById("endStatsWin").textContent =
-		 		`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
-			document.getElementById("winScreen").classList.add("win");
-			document.getElementById("winScreen").style.display = "flex";
-			startCelebration();
 		}
 
 		function restartGame(){
@@ -3062,9 +3243,125 @@
 			if (currentLevel === 10 && extraLives > 0) {
 				extraLives--;
 			} else {
-				lives--;
+				if (!inmortal){
+					lives--;
+				}
 			}
 			updateLivesDisplay();
+		}
+
+		function formatMMSS(totalSec) {
+			const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
+			const ss = String(totalSec % 60).padStart(2, "0");
+			return `${mm}:${ss}`;
+		}
+
+		function captureLastRun() {
+			const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+			const answers = quizCorrects + quizFails;
+			const correctPct = answers > 0 ? Math.round((quizCorrects / answers) * 100) : 0;
+			const failPct = answers > 0 ? 100 - correctPct : 0;
+
+			lastRun = {
+				level: currentLevel + 1,    
+				timeSec: elapsedSec,
+				answers,
+				corrects: quizCorrects,
+				fails: quizFails,
+				correctPct,
+				failPct
+			};
+		}
+
+		function updateAchievementsOverlay() {
+			// Estadísticas de la última partida
+			document.getElementById("achvLevel").textContent     = lastRun.level;
+			document.getElementById("achvTime").textContent      = formatMMSS(lastRun.timeSec);
+			document.getElementById("achvAnswers").textContent   = lastRun.answers;
+			document.getElementById("achvCorrects").textContent  = `${lastRun.corrects} (${lastRun.correctPct}%)`;
+			document.getElementById("achvFails").textContent     = `${lastRun.fails} (${lastRun.failPct}%)`;
+
+			// DEstadísticas del Mejor tiempo
+			if (bestTimeRecord) {
+				const s = bestTimeRecord.stats;
+				document.getElementById("recBestTimeName").textContent     = bestTimeRecord.name;
+				document.getElementById("recBestTimeTime").innerHTML      = `<strong>${formatMMSS(s.timeSec)}</strong>`;
+				document.getElementById("recBestTimeQuestions").textContent = s.answers;
+				document.getElementById("recBestTimeCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recBestTimeFails").textContent    = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestTimeLevel").textContent    = s.level;
+			}
+
+			// Estadísticas del que tiene Más aciertos
+			if (bestCorrectsRecord) {
+				const s = bestCorrectsRecord.stats;
+				document.getElementById("recBestCorrName").textContent      = bestCorrectsRecord.name;
+				document.getElementById("recBestCorrTime").textContent      = formatMMSS(s.timeSec);
+				document.getElementById("recBestCorrQuestions").textContent = s.answers;
+				document.getElementById("recBestCorrCorrects").innerHTML    = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
+				document.getElementById("recBestCorrFails").textContent     = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestCorrLevel").textContent     = s.level;
+			}
+
+		}
+
+		function actualizarMedallas() {
+			for (const tipo in medallasEstado) {
+				const imgElem = document.getElementById(`medalla-${tipo}`);
+				//if (!imgElem) continue; 
+				imgElem.src = imagePaths.medallas[tipo];
+				if (!medallasEstado[tipo]) {
+					imgElem.style.filter = "grayscale(100%)";
+					imgElem.style.opacity = "0.6";
+				} else {
+					imgElem.style.filter = "none";
+					imgElem.style.opacity = "1";
+				}
+			}
+		}
+
+		function checkAchivements() {
+			if (quizCorrects >= 10 && !medallasEstado.aciertos_10) {
+				medallasEstado.aciertos_10 = true;
+			}
+
+			if (quizCorrects >= 25 && quizfails == 0 && !medallasEstado.aciertos_25) {
+				medallasEstado.aciertos_25 = true;
+			}
+
+			if (quizCorrects >= 50 && !medallasEstado.aciertos_50) {
+				medallasEstado.aciertos_50 = true;
+			}
+
+			if (lastRun.timeSec < 600 && gameWon && !medallasEstado.veloz) {
+				medallasEstado.veloz = true;
+			}
+
+			// Guardar en localStorage
+			localStorage.setItem("medallasEstado", JSON.stringify(medallasEstado));
+		}
+
+		function checkRecords() {
+			// --- Mejor tiempo (buscamos tiempo menor) ---
+			if (gameWon){
+				if (!bestTimeRecord || lastRun.timeSec < bestTimeRecord.stats.timeSec) {
+					const name = prompt("Nuevo récord de tiempo: ¡indica tu nombre!", "Tu nombre...");
+					bestTimeRecord = { name: name || "—", stats: { ...lastRun } };
+					localStorage.setItem("bestTimeRecord", JSON.stringify(bestTimeRecord));
+				}
+			}
+
+			// --- Más aciertos (si empate, desempatar por % aciertos) ---
+			const currentCorrects = lastRun.corrects;
+			const currentPct = lastRun.correctPct;
+			if (!bestCorrectsRecord
+				|| currentCorrects > bestCorrectsRecord.stats.corrects
+				|| (currentCorrects === bestCorrectsRecord.stats.corrects
+					&& currentPct > bestCorrectsRecord.stats.correctPct)) {
+				const name = prompt("Nuevo récord de aciertos: ¡indica tu nombre!");
+				bestCorrectsRecord = { name: name || "—", stats: { ...lastRun } };
+				localStorage.setItem("bestCorrectsRecord", JSON.stringify(bestCorrectsRecord));
+			}
 		}
 
 		// ===== Game Loop =====
@@ -3108,6 +3405,7 @@
 					requestAnimationFrame(gameLoop);
 					return;
 				} else {
+					gameWon = true	
 					showWin();
 					return;
 				}
