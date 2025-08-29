@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.20</title>
+  <title>NÁVEX v.0.21</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -2079,7 +2079,7 @@
 				}
 			}
 
-			requestAnimationFrame(gameLoop);
+			//requestAnimationFrame(gameLoop);
 		}
 
 		function quizLoop(){
@@ -3345,20 +3345,20 @@
 			// --- Mejor tiempo (buscamos tiempo menor) ---
 			if (gameWon){
 				if (!bestTimeRecord || lastRun.timeSec < bestTimeRecord.stats.timeSec) {
-					const name = prompt("Nuevo récord de tiempo: ¡indica tu nombre!", "Tu nombre...");
+					const name = prompt("¡¡¡Nuevo récord de TIEMPO!!!: Escribe tu nombre!");
 					bestTimeRecord = { name: name || "—", stats: { ...lastRun } };
 					localStorage.setItem("bestTimeRecord", JSON.stringify(bestTimeRecord));
 				}
 			}
 
-			// --- Más aciertos (si empate, desempatar por % aciertos) ---
+			// --- Más aciertos (si hat empate, se desempata por % aciertos) ---
 			const currentCorrects = lastRun.corrects;
 			const currentPct = lastRun.correctPct;
 			if (!bestCorrectsRecord
 				|| currentCorrects > bestCorrectsRecord.stats.corrects
 				|| (currentCorrects === bestCorrectsRecord.stats.corrects
 					&& currentPct > bestCorrectsRecord.stats.correctPct)) {
-				const name = prompt("Nuevo récord de aciertos: ¡indica tu nombre!");
+				const name = prompt("¡¡¡Nuevo récord de ACIERTOS!!!: Escribe tu nombre!");
 				bestCorrectsRecord = { name: name || "—", stats: { ...lastRun } };
 				localStorage.setItem("bestCorrectsRecord", JSON.stringify(bestCorrectsRecord));
 			}
@@ -3373,7 +3373,7 @@
 				return;
 			}
 			if(quizActive){
-				// durante el quiz SOLO corre quizLoop
+				requestAnimationFrame(gameLoop);
 				return;
 			}
 			if(paused){
