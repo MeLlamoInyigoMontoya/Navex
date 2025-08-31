@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.21</title>
+  <title>NÁVEX v.0.24</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -310,6 +310,7 @@
 			<div class="bg-gray-800 p-8 rounded-lg text-white space-y-4 text-center w-64">
 				<h1 class="text-3xl font-bold">NÁVEX</h1>
 				<button id="btnPlay" class="menu-button bg-blue-600 hover:bg-blue-500 w-full">Jugar</button>
+				<button id="btnPlayInfinite" class="menu-button bg-blue-700 hover:bg-blue-600 w-full">Jugar ∞</button>
 				<button id="btnControls" class="menu-button bg-green-600 hover:bg-green-500 w-full">Controles</button>
 				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido OFF</button>
 				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
@@ -447,6 +448,7 @@
 			<div class="row2">
 				<div id="quizStats">Aciertos: 0 | Fallos: 0</div>
 				<div class="hud-right">
+					<span id="debugIcon" class="select-none text-white text-2xl ml-4">🔧</span>					
 					<span id="time">🕒 00:00</span>
 					<span id="muteIcon" class="select-none text-white text-2xl ml-4">🔊</span>
 				</div>
@@ -507,8 +509,16 @@
   	</div>
 
   	<script>
-		// DEBUG
+		// DEBUG ------
 		let inmortal = false;
+		let qPressCount = 0;
+        let lastQPressTime = 0;
+		let debugMode = false
+		//-------------
+
+		// Variables para el modo infinito
+		let isInfiniteMode = false;
+		let nextEnemySpawnTime = null;
 
 		// ===== Carga de imágenes =====
 		const playerImage     = new Image();
@@ -596,6 +606,10 @@
 				}
 			};
 		}
+
+		// Icono para indicar si se pueden usar los trucos para debug (o cheat)
+		const debugIcon = document.getElementById("debugIcon");	
+		debugIcon.classList.add("hidden");	// Inicialmente oculto
 
 		// Audio
 		let muted = true;// Empezamos con el sonido apagado
@@ -775,6 +789,19 @@
 				satelliteRate: 0,
 				blindSatRate: 0,
 				absorberSatRate: 0.005
+			},
+			{
+				goal: Infinity,
+				message: 'Modo ∞',
+				visuals: [
+					{ img: rockImage, text: '¡De todo!' }
+				],
+				rockRate:       0.03,
+				strongProb:     0.5,
+				cometRate:      0.005,
+				satelliteRate:  0.001,
+				blindSatRate:   0.001,
+				absorberSatRate:0.001
 			}
 
 
@@ -887,6 +914,7 @@
 		const controlsOverlay   = document.getElementById("controlsOverlay");
 		const achievementsOverlay = document.getElementById("achievementsOverlay");
 		const btnPlayMenu       = document.getElementById("btnPlay");
+		const btnPlayInfinite = document.getElementById("btnPlayInfinite");
 		const btnControlsMenu   = document.getElementById("btnControls");
 		const btnSoundMenu      = document.getElementById("btnSoundMenu");
 		const btnAchievements   = document.getElementById("btnAchievements");
@@ -930,10 +958,6 @@
 		function hideAchievements() { achievementsOverlay.classList.add("hidden"); }
 
 		// Botones del menú
-		btnPlayMenu.onclick = () => {
-			hideMainMenu();
-		};
-
 		btnControlsMenu.onclick = () => {
 			showControls();
 		};
@@ -953,6 +977,7 @@
 		btnBackToMenu.forEach(b => {
 			b.onclick = () => {
 				// reset de estado de juego
+				isInfiniteMode = false;
 				lives        = maxLives;
 				extraLives   = 0; // si usas vidas extra en nivel 11
 				score        = 0;
@@ -986,12 +1011,29 @@
 			};
 		});
 
-
 		btnPlayMenu.onclick = () => {
-			hideMainMenu();
+			isInfiniteMode = false; 	// Desactivamos modo infinito
+			startTime = Date.now();		// iniciamos cronómetro
+			hideMainMenu();				// cerramos menú
 			startBackgroundMusic();
 			requestAnimationFrame(gameLoop);
 		};
+
+		btnPlayInfinite.onclick = () => {
+			isInfiniteMode = true; 		// activamos modo infinito
+			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla
+
+			// Apunta al nuevo nivel (es el último del array)
+			currentLevel = levels.length - 1;
+			// Nunca se cumple score ≥ Infinity
+			scoreGoal    = Infinity;
+
+			startTime      = Date.now();         // iniciamos cronómetro
+			hideMainMenu();                      // cerramos menú
+			startBackgroundMusic();
+			requestAnimationFrame(gameLoop);
+		};
+
 
 		// ===== HUD =====
 		function updateLivesDisplay(){
@@ -1030,28 +1072,23 @@
 		}
 
 		function updateHUD(){
-			document.getElementById("score").textContent =
-				`${score} / ${scoreGoal}`;
+			if (isInfiniteMode) {
+				document.getElementById("score").textContent = `${score}`;
+			} else {
+				document.getElementById("score").textContent = `${score} / ${scoreGoal}`;
+			}
+
 			const elapsed = Math.floor((Date.now()-startTime)/1000);
 			const mm = String(Math.floor(elapsed/60)).padStart(2,"0");
 			const ss = String(elapsed%60).padStart(2,"0");
-			document.getElementById("time").textContent =
-				`🕒 ${mm}:${ss}`;
-			document.getElementById("levelIndicator").textContent =
-				`Nivel ${currentLevel + 1}`;
-			document.getElementById("quizStats").textContent =
-				`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("time").textContent =`🕒 ${mm}:${ss}`;
+			//document.getElementById("levelIndicator").textContent =	`Nivel ${currentLevel + 1}`;
 
-			//Indicar tipo de disparo
-			// let gradeLabel;
-			// switch (SHOT_GRADES[shotGrade].type) {
-			// 	case "simple":
-			// 		gradeLabel = `Simple (${shotGrade + 1})`; break;
-			// 	case "double":
-			// 		gradeLabel = "Doble"; break;
-			// 	case "quadruple":
-			// 		gradeLabel = "Cuádruple"; break;
-			// }
+			const levelLabel = isInfiniteMode ? "∞" : `Nivel ${currentLevel+1}`;
+			document.getElementById("levelIndicator").textContent = levelLabel;
+
+			document.getElementById("quizStats").textContent =`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+
 		}
 
 		// ===== Overlay nivel =====
@@ -2715,22 +2752,62 @@
 
 
 			// DEBUG:-----------------
-			if(e.code==="KeyD") shotGrade = 4;
-			if(e.code==="KeyE") player.shieldLevel = 3;
-			if (e.code === "KeyL" && currentLevel < levels.length - 1) {
-				// Limpia entidades
-				resetEntities();
+			if (e.code === "KeyQ") {// Comprueba si se ha pulsado la tecla "Q" 3 veces para activar "cheats"
+				const now = Date.now();
 
-				// Avanza de nivel
-				currentLevel++;
-				score = 0;
-				scoreGoal = levels[currentLevel].goal;
-				updateHUD();
-				showLevelOverlay();
+				// Resetea el contador si ha pasado más de 1 segundo desde la última vez
+				if (now - lastQPressTime > 1000) {
+					qPressCount = 0;
+				}
+
+				// Incrementa el contador y actualiza el tiempo
+				qPressCount++;
+				lastQPressTime = now;
+
+				// Si el contador llega a 3, muestra el mensaje y resetea
+				if (qPressCount === 3) {
+					debugMode = !debugMode
+
+					//const debugIcon = document.getElementById("debugIcon");
+					if (debugMode) {
+						debugIcon.classList.remove("hidden");
+					} else {
+						debugIcon.classList.add("hidden");
+					}
+				}
+			} else {
+				// Si se pulsa cualquier otra tecla, se rompe la secuencia
+				qPressCount = 0;
+			}
+
+			if(e.code==="KeyD") {
+				if (debugMode ){
+					shotGrade = 4;
+				}
+			}
+			if(e.code==="KeyE") {
+				if (debugMode ){
+					player.shieldLevel = 3;
+				}
+			}
+			if (e.code === "KeyL" && currentLevel < levels.length - 1) {
+				if (debugMode ){
+					// Limpia entidades
+					resetEntities();
+
+					// Avanza de nivel
+					currentLevel++;
+					score = 0;
+					scoreGoal = levels[currentLevel].goal;
+					updateHUD();
+					showLevelOverlay();
+				}
 			};
 
 			if(e.code==="KeyI") {
-				inmortal = !inmortal;
+				if (debugMode ){
+					inmortal = !inmortal;
+				}
 			};
 			// -------------------------
 			
@@ -3032,6 +3109,7 @@
 
 		function restartGame(){
 			// Reset variables 
+			isInfiniteMode = false;
 			lives        = maxLives;
 			score        = 0;
 			shotGrade    = 0;
@@ -3047,6 +3125,7 @@
 			player.shieldLevel = 0;
 			player.lastHitTime = 0;
 			player.flashTime   = 0;
+			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla (en el modo infinito)
 
 			// Reiniciar estado del jugador
 			resetPlayer();
@@ -3364,6 +3443,74 @@
 			}
 		}
 
+		function spawnRandomInfiniteEnemy() {
+			const enemyTypes = [
+				'basic',
+				'laser',
+				'fractal',
+				'satellite',
+				'blindSatellite',
+				'absorberSatellite'
+			];
+			const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+			const side = Math.random() < 0.5 ? "left" : "right";
+
+			switch (randomType) {
+				case 'basic':
+					// Genera una nave enemiga básica
+					spawnEnemy(side);
+					break;
+				case 'laser':
+					// Genera una nave láser
+					spawnLaserShip(side);
+					break;
+				case 'fractal':
+					// Genera una nave fractal
+					spawnFractalShip(side);
+					break;
+				case 'satellite':
+					{ // Crea un ámbito local para las variables
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 100;
+						const dx = spawnSide === "left" ? 1 : -1;
+						satellites.push({
+							x, y, size, dx, hp: 1,
+							probShot: 0.02
+						});
+					}
+					break;
+				case 'blindSatellite':
+					{
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 100;
+						const dx = spawnSide === "left" ? 1 : -1;
+						let tmin = 4000;
+						let tmax = 6000;
+						blindSatellites.push({
+							x, y, size, dx, hp: 1,
+							nextWaveTime: Date.now() + tmin + Math.random() * (tmax - tmin)
+						});
+					}
+					break;
+				case 'absorberSatellite':
+					{
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 140;
+						const dx = spawnSide === "left" ? 1 : -1;
+						absorberSatellites.push({
+							x, y, size, dx
+						});
+					}
+					break;
+			}
+		}
+
 		// ===== Game Loop =====
 		function gameLoop(){
 			if(!gameRunning) return;
@@ -3392,22 +3539,46 @@
 			//Comprobar si se ha perdido
 			if(lives<=0){ showGameOver(); return; }
 
-			if(score>=scoreGoal){
-				if(currentLevel<levels.length-1){
-					resetEntities();
 
-					currentLevel++;
-					score     = 0;
-					scoreGoal = levels[currentLevel].goal;
-					updateHUD();
-					showLevelOverlay();
+			if (!isInfiniteMode) {	// Si es el modo de juego normal
+				if(score>=scoreGoal){
+					if(currentLevel<levels.length-1){
+						resetEntities();
 
-					requestAnimationFrame(gameLoop);
-					return;
-				} else {
-					gameWon = true	
-					showWin();
-					return;
+						currentLevel++;
+						score     = 0;
+						scoreGoal = levels[currentLevel].goal;
+						updateHUD();
+						showLevelOverlay();
+
+						requestAnimationFrame(gameLoop);
+						return;
+					} else {
+						gameWon = true	
+						showWin();
+						return;
+					}
+				}
+			} else {	// Si es el modo de juego infinito
+				// Comprobamos si hay alguna nave enemiga o satélite en pantalla
+				const isMajorEnemyActive = enemies.length > 0 ||
+										   laserShips.length > 0 ||
+										   fractalShips.length > 0 ||
+										   satellites.length > 0 ||
+										   blindSatellites.length > 0 ||
+										   absorberSatellites.length > 0;
+
+				// Si no hay ninguna nave enemiga o satélite se crea una de forma aleatoria
+				if (!isMajorEnemyActive) {
+					if (!nextEnemySpawnTime) {
+						// Establece un retardo de 2 segundos antes de que aparezca el siguiente enemigo
+						nextEnemySpawnTime = Date.now() + 2000;
+					}
+
+					if (Date.now() >= nextEnemySpawnTime) {
+						spawnRandomInfiniteEnemy();
+						nextEnemySpawnTime = null; // Reinicia el temporizador
+					}
 				}
 			}
 
@@ -3443,90 +3614,134 @@
 			drawExplosions();		// Efecto de explosión (de las entidades que se hayan destruido)
 			drawPopups();			// Efecto de mostrar cantidad de puntos obtenidos en la explosión
 
-			// Nivel 4 (índice 3) → naves enemigas básicas
-			if (currentLevel === 3) {
+			if (isInfiniteMode) {	//Modo infinito
+				// MODO INFINITO: Mueve y dibuja todos los tipos de enemigos posibles.
+				
+				// Cometas (ya que pueden aparecer)
+				if (Math.random() < levels[currentLevel].cometRate) spawnComet();
+				drawComets();
+				
+				// Naves enemigas básicas
 				moveEnemies();
 				updateEnemyShooting();
 				drawEnemies();
 				drawEnemyBullets();
-			}
 
-			// Solo a partir del Nivel 5 (índice 4)
-			if(currentLevel >= 4){
-				if (Math.random() < levels[currentLevel].cometRate) {
-					spawnComet();
-				}
-				drawComets();
-			}
-
-
-			// Nivel 6 (índice 5) → naves láser
-			if (currentLevel === 5){
+				// Naves láser
 				moveLaserShips();
 				updateLaserFiring();
 				drawLaserShips();
 				drawLaserBeams();
-			}
-			
-			// Nivel 7 (índice 6) → nave fractal
-			if (currentLevel === 6){
+
+				// Naves fractales
 				moveFractalShips();
 				updateFractalShooting();
-				updateFractalBullets(); 
+				updateFractalBullets();
 				drawFractalShips();
 				drawFractalBullets();
-			}
-						
-			// Nivel 8 (índice 7) → satélite paralizador
-			if (currentLevel === 7) {
-				spawnSatellite();	// crea satélites
-				moveSatellite();	// Mueve los satélites
-				updateWaveShooting();	// Disparar ondas paralizadoras
-				drawSatellites();	// Dibuja en pantalla los satélites paralizadores
-				drawWaveSlices();	// Dibuja en pantalla las ondas de los satélites
-			}
+				
+				// Satélite paralizador
+				moveSatellite();
+				updateWaveShooting();
+				drawSatellites();
+				drawWaveSlices();
 
-			// Nivel 9 (índice 8) → satélite cegador
-			if (currentLevel === 8) {
-				spawnBlindSatellite();
+				// Satélite cegador
 				moveBlindSatellites();
 				updateBlindWave();
-				drawBlindSatellites();	// Dibuja en pantalla los satélites cegadores
+				drawBlindSatellites();
 				drawBlindWaves();
 
-				moveEnemies();
-				updateEnemyShooting();
-				drawEnemies();
-				drawEnemyBullets();
-			}
-
-			if (currentLevel === 9) { // Nivel 10 (índice 9)
-				spawnAbsorberSatellite();
+				// Satélite absorbedor
 				moveAbsorberSatellites();
 				drawAbsorberSatellites();
 
-				moveEnemies();
-				updateEnemyShooting();
-				drawEnemies();
-				drawEnemyBullets();
+			} else {	// Modo campaña
+				// Nivel 4 (índice 3) → naves enemigas básicas
+				if (currentLevel === 3) {
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+				}
 
-				moveFractalShips();
-				updateFractalShooting();
-				updateFractalBullets(); 
-				drawFractalShips();
-				drawFractalBullets();
-			}
-			
-			if (currentLevel === 10) {  // Nivel 11 - Final (índice 10)
-				spawnMirrorShip();
-				moveMirrorShip();
-				drawMirrorShip();
-				updateMirrorShooting();
-				drawMirrorBullets();
+				// Solo a partir del Nivel 5 (índice 4)
+				if(currentLevel >= 4){
+					if (Math.random() < levels[currentLevel].cometRate) {
+						spawnComet();
+					}
+					drawComets();
+				}
 
-				spawnAbsorberSatellite();
-				moveAbsorberSatellites();
-				drawAbsorberSatellites();
+
+				// Nivel 6 (índice 5) → naves láser
+				if (currentLevel === 5){
+					moveLaserShips();
+					updateLaserFiring();
+					drawLaserShips();
+					drawLaserBeams();
+				}
+				
+				// Nivel 7 (índice 6) → nave fractal
+				if (currentLevel === 6){
+					moveFractalShips();
+					updateFractalShooting();
+					updateFractalBullets(); 
+					drawFractalShips();
+					drawFractalBullets();
+				}
+							
+				// Nivel 8 (índice 7) → satélite paralizador
+				if (currentLevel === 7) {
+					spawnSatellite();	// crea satélites
+					moveSatellite();	// Mueve los satélites
+					updateWaveShooting();	// Disparar ondas paralizadoras
+					drawSatellites();	// Dibuja en pantalla los satélites paralizadores
+					drawWaveSlices();	// Dibuja en pantalla las ondas de los satélites
+				}
+
+				// Nivel 9 (índice 8) → satélite cegador
+				if (currentLevel === 8) {
+					spawnBlindSatellite();
+					moveBlindSatellites();
+					updateBlindWave();
+					drawBlindSatellites();	// Dibuja en pantalla los satélites cegadores
+					drawBlindWaves();
+
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+				}
+
+				if (currentLevel === 9) { // Nivel 10 (índice 9)
+					spawnAbsorberSatellite();
+					moveAbsorberSatellites();
+					drawAbsorberSatellites();
+
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+
+					moveFractalShips();
+					updateFractalShooting();
+					updateFractalBullets(); 
+					drawFractalShips();
+					drawFractalBullets();
+				}
+				
+				if (currentLevel === 10) {  // Nivel 11 - Final (índice 10)
+					spawnMirrorShip();
+					moveMirrorShip();
+					drawMirrorShip();
+					updateMirrorShooting();
+					drawMirrorBullets();
+
+					spawnAbsorberSatellite();
+					moveAbsorberSatellites();
+					drawAbsorberSatellites();
+				}
 			}
 
 			// Comprueba si ciertas entidades (balas, rocas, enemigos...) han entrado en contacto.
@@ -3545,10 +3760,8 @@
 		player.x = canvas.width/2 - player.w/2;
 		player.y = canvas.height - player.h - 20;
 		updateLivesDisplay();
-		//showLevelOverlay();
 		updateHUD();
 		updateMuteIcon();// Inicializamos el icono al arrancar
-		//gameLoop();
 
 		// Al cargar, mostramos primero el menú principal:
 		showMainMenu();
