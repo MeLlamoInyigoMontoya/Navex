@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.24</title>
+  <title>NÁVEX v.0.26</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -314,6 +314,11 @@
 				<button id="btnControls" class="menu-button bg-green-600 hover:bg-green-500 w-full">Controles</button>
 				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido OFF</button>
 				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
+				<div class="mt-4 text-gray-400 text-xs">
+					<p>De Álex y David (López)</p>
+					<p>Versión 0.26 (alfa)</p>
+				</div>
+			
 			</div>
 		</div>
 
@@ -370,7 +375,7 @@
 		<!-- >>>>>> OVERLAY LOGROS <<<<<< -->
 		<div id="achievementsOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   			<div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">
-				<h2 class="text-xl mb-4 text-center">RÉCORDS</h2>
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO CAMPAÑA</h2>
 
 				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
 					<!-- Fila 1:  Encabezado -->
@@ -382,7 +387,7 @@
 					<div class="font-semibold">Nivel</div>
 
 					<!-- Fila 2: Última partida -->
-					<div class="font-semibold  whitespace-nowrap">Última partida</div>
+					<div class="font-semibold  whitespace-nowrap" style="color: cyan;">Última partida</div>
 					<div id="achvTime">—:—</div>
 					<div id="achvAnswers">0</div>
 					<div id="achvCorrects">0 (0%)</div>
@@ -390,7 +395,7 @@
 					<div id="achvLevel">—</div>
 
 					<!-- Fila 3: Mejor tiempo -->
-					<div id="recBestTimeName"></div>
+					<div id="recBestTimeName" style="color: cyan;"></div>
 					<div id="recBestTimeTime"><strong>—:—</strong></div>
 					<div id="recBestTimeQuestions">—</div>
 					<div id="recBestTimeCorrects">—</div>
@@ -398,17 +403,54 @@
 					<div id="recBestTimeLevel">—</div>
 
 					<!-- Fila 4: Más aciertos -->
-					<div id="recBestCorrName"></div>
+					<div id="recBestCorrName" style="color: cyan;"></div>
 					<div id="recBestCorrTime">—:—</div>
 					<div id="recBestCorrQuestions">—</div>
 					<div id="recBestCorrCorrects"><strong>—</strong></div>
 					<div id="recBestCorrFails">—</div>
 					<div id="recBestCorrLevel">—</div>
 				</div>
-
 				<br>
-				<h2 class="text-xl mb-4 text-center">LOGROS</h2>
 
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO INFINITO</h2>
+				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
+					<div></div> <div class="font-semibold">Tiempo</div>
+					<div class="font-semibold">Preguntas</div>
+					<div class="font-semibold">Aciertos</div>
+					<div class="font-semibold">Fallos</div>
+					<div class="font-semibold">Puntuación</div>
+
+					<div class="font-semibold whitespace-nowrap" style="color: cyan;">Última partida ∞</div>
+					<div id="achvInfTime">—:—</div>
+					<div id="achvInfAnswers">0</div>
+					<div id="achvInfCorrects">0 (0%)</div>
+					<div id="achvInfFails">0 (0%)</div>
+					<div id="achvInfScore">0</div>
+
+					<div id="recInfBestTimeName" style="color: cyan;"></div>
+					<div id="recInfBestTimeTime"><strong>—:—</strong></div>
+					<div id="recInfBestTimeQuestions">—</div>
+					<div id="recInfBestTimeCorrects">—</div>
+					<div id="recInfBestTimeFails">—</div>
+					<div id="recInfBestTimeScore">—</div>
+
+					<div id="recInfBestCorrName" style="color: cyan;"></div>
+					<div id="recInfBestCorrTime">—:—</div>
+					<div id="recInfBestCorrQuestions">—</div>
+					<div id="recInfBestCorrCorrects"><strong>—</strong></div>
+					<div id="recInfBestCorrFails">—</div>
+					<div id="recInfBestCorrScore">—</div>
+
+					<div id="recInfBestScoreName" style="color: cyan;"></div>
+					<div id="recInfBestScoreTime">—:—</div>
+					<div id="recInfBestScoreQuestions">—</div>
+					<div id="recInfBestScoreCorrects">—</div>
+					<div id="recInfBestScoreFails">—</div>
+					<div id="recInfBestScoreScore"><strong>—</strong></div>
+				</div>
+				<br>
+
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">LOGROS</h2>
 				<div id="medallas" class="mt-6 space-y-4">
 					<div class="flex items-center">
 						<img id="medalla-aciertos_10" src="" alt="medalla-aciertos_10" class="w-12 h-12 mr-4">
@@ -519,6 +561,7 @@
 		// Variables para el modo infinito
 		let isInfiniteMode = false;
 		let nextEnemySpawnTime = null;
+		let lastGameWasInfinite = false;
 
 		// ===== Carga de imágenes =====
 		const playerImage     = new Image();
@@ -575,9 +618,14 @@
 				console.warn("Error al cargar medallas guardadas:", e);
 			}
 		}
+		// Modo campaña
 		let bestTimeRecord = JSON.parse(localStorage.getItem("bestTimeRecord")) || null;
 		let bestCorrectsRecord = JSON.parse(localStorage.getItem("bestCorrectsRecord")) || null;
-		// Records por defecto si aún no hay ninguno
+		// Modo Infinito
+		let bestTimeRecordInfinite = JSON.parse(localStorage.getItem("bestTimeRecordInfinite")) || null;
+		let bestCorrectsRecordInfinite = JSON.parse(localStorage.getItem("bestCorrectsRecordInfinite")) || null;
+		let bestScoreRecordInfinite = JSON.parse(localStorage.getItem("bestScoreRecordInfinite")) || null;
+		// Records por defecto en modo campaña si aún no hay ninguno
 		if (!bestTimeRecord) {
 			bestTimeRecord = {
 				name: "TORTUGA",
@@ -604,6 +652,25 @@
 					failPct: 40,
 					level: 3
 				}
+			};
+		}
+		// Records por defecto para el modo infinito  si aún no hay ninguno
+		if (!bestTimeRecordInfinite) {
+			bestTimeRecordInfinite = {
+				name: "Superviviente",
+				stats: { timeSec: 60, answers: 2, corrects: 1, correctPct: 50, fails: 1, failPct: 50, score: 2500 }
+			};
+		}
+		if (!bestCorrectsRecordInfinite) {
+			bestCorrectsRecordInfinite = {
+				name: "Sabiondo",
+				stats: { timeSec: 30, answers: 5, corrects: 4, correctPct: 80, fails: 1, failPct: 20, score: 1000 }
+			};
+		}
+		if (!bestScoreRecordInfinite) {
+			bestScoreRecordInfinite = {
+				name: "Avaro",
+				stats: { timeSec: 30, answers: 1, corrects: 0, correctPct: 0, fails: 1, failPct: 100, score: 3000 }
 			};
 		}
 
@@ -929,7 +996,15 @@
 			correctPct: 0,
 			failPct: 0
 		};
-
+		let lastRunInfinite = {
+			timeSec: 0,
+			answers: 0,
+			corrects: 0,
+			fails: 0,
+			correctPct: 0,
+			failPct: 0,
+			score: 0
+		};
 
 		// ===== MENÚ =====
 		// Ocultar/mostrar helpers
@@ -952,6 +1027,7 @@
 			captureLastRun();   
   			checkRecords();
 			updateAchievementsOverlay();
+			updateAchievementsOverlayInfinite();
 			actualizarMedallas();
 			achievementsOverlay.classList.remove("hidden"); 
 		}
@@ -1023,7 +1099,7 @@
 			isInfiniteMode = true; 		// activamos modo infinito
 			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla
 
-			// Apunta al nuevo nivel (es el último del array)
+			// Apunta al nivel infinito (es el último del array)
 			currentLevel = levels.length - 1;
 			// Nunca se cumple score ≥ Infinity
 			scoreGoal    = Infinity;
@@ -2790,7 +2866,7 @@
 					player.shieldLevel = 3;
 				}
 			}
-			if (e.code === "KeyL" && currentLevel < levels.length - 1) {
+			if (e.code === "KeyL" && currentLevel < 10) {
 				if (debugMode ){
 					// Limpia entidades
 					resetEntities();
@@ -2988,23 +3064,30 @@
 		// ===== Pantallas de fin de juego =====
 		function showGameOver(){
 			gameRunning = false;
+			lastGameWasInfinite = isInfiniteMode;	//Si se ha perdido jugando al modo campaña o al modo infinito
 			captureLastRun();	// Graba los resultados de esta partida
-			checkRecords(); 
+			if (isInfiniteMode) {
+				checkInfiniteRecords(); // Comprueba récords del modo infinito
+			} else {
+				checkRecords(); // Comprueba récords del modo campaña
+			}
 			checkAchivements();	// Comprueba si se ha obtenido algún logro
 			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
 
 			//Datos por pantalla:
-			document.getElementById("endStats").textContent =
-				`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("endStats").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 			document.getElementById("gameOverScreen").style.display = "flex";
 			document.getElementById("ver-logros").onclick = () => { showAchievements();	};
 		}
 
 		function showWin(){
 			gameRunning = false;
-		
 			captureLastRun();	// Graba los resultados de esta partida
-			checkRecords(); 
+			if (isInfiniteMode) {
+				checkInfiniteRecords(); // Comprueba récords del modo infinito
+			} else {
+				checkRecords(); // Comprueba récords del modo campaña
+			}
 			checkAchivements();	// Comprueba si se ha obtenido algún logro
 			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
 
@@ -3109,12 +3192,10 @@
 
 		function restartGame(){
 			// Reset variables 
-			isInfiniteMode = false;
+			
 			lives        = maxLives;
 			score        = 0;
 			shotGrade    = 0;
-			currentLevel = 0;
-			scoreGoal    = levels[0].goal;
 			quizCorrects = 0;
 			quizFails    = 0;
 			startTime    = Date.now();
@@ -3125,7 +3206,19 @@
 			player.shieldLevel = 0;
 			player.lastHitTime = 0;
 			player.flashTime   = 0;
-			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla (en el modo infinito)
+
+			if (lastGameWasInfinite) {
+				// Configuración para reiniciar en MODO INFINITO
+				isInfiniteMode = true;
+				currentLevel = levels.length - 1; // Apunta al último nivel (el infinito)
+				scoreGoal    = Infinity;
+				nextEnemySpawnTime = null;		// reiniciamos el contador de naves enemigas en pantalla (en el modo infinito)
+			} else {
+				// Configuración para reiniciar en MODO CAMPAÑA 
+				isInfiniteMode = false;
+				currentLevel = 0;
+				scoreGoal    = levels[0].goal;
+			}
 
 			// Reiniciar estado del jugador
 			resetPlayer();
@@ -3341,15 +3434,27 @@
 			const correctPct = answers > 0 ? Math.round((quizCorrects / answers) * 100) : 0;
 			const failPct = answers > 0 ? 100 - correctPct : 0;
 
-			lastRun = {
-				level: currentLevel + 1,    
-				timeSec: elapsedSec,
-				answers,
-				corrects: quizCorrects,
-				fails: quizFails,
-				correctPct,
-				failPct
-			};
+			if (isInfiniteMode) {
+				lastRunInfinite = {
+					timeSec: elapsedSec,
+					answers,
+					corrects: quizCorrects,
+					fails: quizFails,
+					correctPct,
+					failPct,
+					score: score 
+				};
+			} else {
+				lastRun = {
+					level: currentLevel + 1,
+					timeSec: elapsedSec,
+					answers,
+					corrects: quizCorrects,
+					fails: quizFails,
+					correctPct,
+					failPct
+				};
+			}
 		}
 
 		function updateAchievementsOverlay() {
@@ -3381,7 +3486,48 @@
 				document.getElementById("recBestCorrFails").textContent     = `${s.fails} (${s.failPct}%)`;
 				document.getElementById("recBestCorrLevel").textContent     = s.level;
 			}
+		}
 
+		function updateAchievementsOverlayInfinite() {
+			// Última partida (Infinito)
+			document.getElementById("achvInfTime").textContent = formatMMSS(lastRunInfinite.timeSec);
+			document.getElementById("achvInfAnswers").textContent = lastRunInfinite.answers;
+			document.getElementById("achvInfCorrects").textContent = `${lastRunInfinite.corrects} (${lastRunInfinite.correctPct}%)`;
+			document.getElementById("achvInfFails").textContent = `${lastRunInfinite.fails} (${lastRunInfinite.failPct}%)`;
+			document.getElementById("achvInfScore").textContent = lastRunInfinite.score;
+
+			// Récord: Mejor tiempo (Infinito) - Más tiempo es mejor
+			if (bestTimeRecordInfinite) {
+				const s = bestTimeRecordInfinite.stats;
+				document.getElementById("recInfBestTimeName").textContent = bestTimeRecordInfinite.name;
+				document.getElementById("recInfBestTimeTime").innerHTML = `<strong>${formatMMSS(s.timeSec)}</strong>`;
+				document.getElementById("recInfBestTimeQuestions").textContent = s.answers;
+				document.getElementById("recInfBestTimeCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recInfBestTimeFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestTimeScore").textContent = s.score;
+			}
+			
+			// Récord: Más aciertos (Infinito)
+			if (bestCorrectsRecordInfinite) {
+				const s = bestCorrectsRecordInfinite.stats;
+				document.getElementById("recInfBestCorrName").textContent = bestCorrectsRecordInfinite.name;
+				document.getElementById("recInfBestCorrTime").textContent = formatMMSS(s.timeSec);
+				document.getElementById("recInfBestCorrQuestions").textContent = s.answers;
+				document.getElementById("recInfBestCorrCorrects").innerHTML = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
+				document.getElementById("recInfBestCorrFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestCorrScore").textContent = s.score;
+			}
+
+			// Récord: Mejor puntuación (Infinito)
+			if (bestScoreRecordInfinite) {
+				const s = bestScoreRecordInfinite.stats;
+				document.getElementById("recInfBestScoreName").textContent = bestScoreRecordInfinite.name;
+				document.getElementById("recInfBestScoreTime").textContent = formatMMSS(s.timeSec);
+				document.getElementById("recInfBestScoreQuestions").textContent = s.answers;
+				document.getElementById("recInfBestScoreCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recInfBestScoreFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestScoreScore").innerHTML = `<strong>${s.score}</strong>`;
+			}
 		}
 
 		function actualizarMedallas() {
@@ -3440,6 +3586,34 @@
 				const name = prompt("¡¡¡Nuevo récord de ACIERTOS!!!: Escribe tu nombre!");
 				bestCorrectsRecord = { name: name || "—", stats: { ...lastRun } };
 				localStorage.setItem("bestCorrectsRecord", JSON.stringify(bestCorrectsRecord));
+			}
+		}
+
+		function checkInfiniteRecords() {
+			// --- Mejor tiempo (sobrevivir más tiempo) ---
+			if (!bestTimeRecordInfinite || lastRunInfinite.timeSec > bestTimeRecordInfinite.stats.timeSec) {
+				const name = prompt("¡¡¡Nuevo récord de SUPERVIVENCIA!!!\nHas aguantado más tiempo que nadie.\n\nEscribe tu nombre:");
+				bestTimeRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestTimeRecordInfinite", JSON.stringify(bestTimeRecordInfinite));
+			}
+
+			// --- Más aciertos ---
+			const currentCorrects = lastRunInfinite.corrects;
+			const currentPct = lastRunInfinite.correctPct;
+			if (!bestCorrectsRecordInfinite 
+				|| currentCorrects > bestCorrectsRecordInfinite.stats.corrects 
+				|| (currentCorrects === bestCorrectsRecordInfinite.stats.corrects && currentPct > bestCorrectsRecordInfinite.stats.correctPct)) 
+			{
+				const name = prompt("¡¡¡Nuevo récord de ACIERTOS (∞)!!!\nNadie ha acertado tanto en el modo infinito.\n\nEscribe tu nombre:");
+				bestCorrectsRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestCorrectsRecordInfinite", JSON.stringify(bestCorrectsRecordInfinite));
+			}
+
+			// --- Mejor puntuación ---
+			if (!bestScoreRecordInfinite || lastRunInfinite.score > bestScoreRecordInfinite.stats.score) {
+				const name = prompt("¡¡¡Nuevo récord de PUNTUACIÓN (∞)!!!\nLa puntuación más alta hasta la fecha.\n\nEscribe tu nombre:");
+				bestScoreRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestScoreRecordInfinite", JSON.stringify(bestScoreRecordInfinite));
 			}
 		}
 
@@ -3540,9 +3714,9 @@
 			if(lives<=0){ showGameOver(); return; }
 
 
-			if (!isInfiniteMode) {	// Si es el modo de juego normal
+			if (!isInfiniteMode) {	// Si es el modo de juego normal (modo campaña)
 				if(score>=scoreGoal){
-					if(currentLevel<levels.length-1){
+					if(currentLevel < 10){
 						resetEntities();
 
 						currentLevel++;
