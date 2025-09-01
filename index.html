@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.26</title>
+  <title>NÁVEX v.0.28</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -225,6 +225,13 @@
 			transform: translateY(2px);
 			box-shadow: 0 2px 0 #222;
 		}
+		.menu-button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			pointer-events: none;/* eliminar el efecto hover */
+			background-color: #444;    /* fondo gris oscuro */
+  			filter: grayscale(100%);   /* escala de grises total */
+		}
 
 		.controls-list {
 			display: flex;
@@ -310,13 +317,13 @@
 			<div class="bg-gray-800 p-8 rounded-lg text-white space-y-4 text-center w-64">
 				<h1 class="text-3xl font-bold">NÁVEX</h1>
 				<button id="btnPlay" class="menu-button bg-blue-600 hover:bg-blue-500 w-full">Jugar</button>
-				<button id="btnPlayInfinite" class="menu-button bg-blue-700 hover:bg-blue-600 w-full">Jugar ∞</button>
+				<button id="btnPlayInfinite" class="menu-button bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed w-full">Jugar ∞</button>
 				<button id="btnControls" class="menu-button bg-green-600 hover:bg-green-500 w-full">Controles</button>
 				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido OFF</button>
 				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
 				<div class="mt-4 text-gray-400 text-xs">
 					<p>De Álex y David (López)</p>
-					<p>Versión 0.26 (alfa)</p>
+					<p>Versión 0.28 (alfa)</p>
 				</div>
 			
 			</div>
@@ -324,9 +331,11 @@
 
 		<!-- >>>>>> OVERLAY CONTROLES <<<<<< -->
 		<div id="controlsOverlay" class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-[32rem]">
-				<h2 class="text-xl mb-4 text-center">CONTROLES</h2>
-
+			<div class="bg-gray-800 p-6 rounded-lg text-white w-[32rem] max-h-[90vh] overflow-y-auto scrollable-content">
+				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
+				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
+				scrollable-content → nombre del estilo CSS usado-->
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">CONTROLES</h2>
 				<div class="controls-list">
 					<div class="controls-row">
 						<span class="controls-key">
@@ -364,7 +373,11 @@
 					</div>				
 					<hr class="my-4 border-gray-600">
 					<p class="text-xl text-gray-300 mb-2 text-center">
-					OBJETIVO: Destruyen enemigos y recolecta objetos para alcanzar la puntuación del nivel.
+					<span class="text-yellow-400">OBJETIVO:</span> Destruye enemigos y recolecta objetos para alcanzar la puntuación del nivel.
+					</p>
+					<!--<hr class="my-4 border-gray-600">-->
+					<p class="text-xl text-gray-300 mb-2 text-center">
+					Supera todos los niveles del juego para desbloquear el Modo Infinito (<span class="text-yellow-400">Jugar ∞</span>)
 					</p>
 
 				</div>
@@ -374,7 +387,11 @@
 
 		<!-- >>>>>> OVERLAY LOGROS <<<<<< -->
 		<div id="achievementsOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  			<div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">
+  			<!-- <div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">-->
+			<div class="bg-gray-800 p-6 rounded-lg text-white w-[42rem] max-h-[90vh] overflow-y-auto scrollable-content">
+				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
+				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
+				scrollable-content → nombre del estilo CSS usado-->
 				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO CAMPAÑA</h2>
 
 				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
@@ -562,6 +579,7 @@
 		let isInfiniteMode = false;
 		let nextEnemySpawnTime = null;
 		let lastGameWasInfinite = false;
+		let campaignDone = false;
 
 		// ===== Carga de imágenes =====
 		const playerImage     = new Image();
@@ -861,7 +879,7 @@
 				goal: Infinity,
 				message: 'Modo ∞',
 				visuals: [
-					{ img: rockImage, text: '¡De todo!' }
+					{ img: playerImage, text: '¡De todo!' }
 				],
 				rockRate:       0.03,
 				strongProb:     0.5,
@@ -1013,7 +1031,13 @@
 			// pausa y resetea el juego
 			gameRunning = false;
 			resetEntities();
+
+			// comprobar si está desbloqueado el modo infinito
+			refreshInfiniteButton();
+			// campaignDone = localStorage.getItem("campaignCompleted") === "true";
+			// btnPlayInfinite.disabled = !campaignDone;
 		}
+
 		function hideMainMenu() {
 			mainMenu.classList.add("hidden");
 			gameRunning = true;
@@ -1088,14 +1112,21 @@
 		});
 
 		btnPlayMenu.onclick = () => {
+			restartGame();
 			isInfiniteMode = false; 	// Desactivamos modo infinito
-			startTime = Date.now();		// iniciamos cronómetro
+			//startTime = Date.now();		// iniciamos cronómetro
 			hideMainMenu();				// cerramos menú
 			startBackgroundMusic();
 			requestAnimationFrame(gameLoop);
 		};
 
 		btnPlayInfinite.onclick = () => {
+			campaignDone = localStorage.getItem("campaignCompleted") === "true";
+			if (!campaignDone) {
+				alert("Completa primero todos los niveles para desbloquear el modo infinito");
+				return;
+			}
+			restartGame();
 			isInfiniteMode = true; 		// activamos modo infinito
 			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla
 
@@ -3086,6 +3117,10 @@
 			if (isInfiniteMode) {
 				checkInfiniteRecords(); // Comprueba récords del modo infinito
 			} else {
+				localStorage.setItem("campaignCompleted", "true");
+				btnPlayInfinite.disabled = false;	// Reactivar botón
+				refreshInfiniteButton();
+
 				checkRecords(); // Comprueba récords del modo campaña
 			}
 			checkAchivements();	// Comprueba si se ha obtenido algún logro
@@ -3550,7 +3585,7 @@
 				medallasEstado.aciertos_10 = true;
 			}
 
-			if (quizCorrects >= 25 && quizfails == 0 && !medallasEstado.aciertos_25) {
+			if (quizCorrects >= 25 && quizFails == 0 && !medallasEstado.aciertos_25) {
 				medallasEstado.aciertos_25 = true;
 			}
 
@@ -3683,6 +3718,18 @@
 					}
 					break;
 			}
+		}
+
+		function refreshInfiniteButton() {
+			const unlocked = localStorage.getItem("campaignCompleted") === "true";
+			btnPlayInfinite.disabled = !unlocked;
+
+			// Opcional: aspecto más claro cuando está bloqueado
+			btnPlayInfinite.classList.toggle('bg-blue-700', unlocked);
+			btnPlayInfinite.classList.toggle('hover:bg-blue-600', unlocked);
+			btnPlayInfinite.classList.toggle('bg-gray-700', !unlocked);
+			btnPlayInfinite.classList.toggle('hover:bg-gray-600', !unlocked);
+			//btnPlayInfinite.textContent = unlocked ? 'Jugar ∞' : 'Bloqueado ∞';
 		}
 
 		// ===== Game Loop =====
@@ -3937,11 +3984,15 @@
 		updateHUD();
 		updateMuteIcon();// Inicializamos el icono al arrancar
 
+		// Oculta Modo ∞ si el modo campaña no está completada
+		//btnPlayInfinite = document.getElementById("btnPlayInfinite");
+		// campaignDone = localStorage.getItem("campaignCompleted") === "true";
+		// if (!campaignDone) {
+		// 	btnPlayInfinite.disabled = true;	// impide el clic.
+		// }
+		refreshInfiniteButton();
 		// Al cargar, mostramos primero el menú principal:
 		showMainMenu();
-
-		
-
   	</script>
 </body>
 </html>
