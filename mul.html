@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.16</title>
+  <title>NÁVEX v.0.29</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -225,6 +225,13 @@
 			transform: translateY(2px);
 			box-shadow: 0 2px 0 #222;
 		}
+		.menu-button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			pointer-events: none;/* eliminar el efecto hover */
+			background-color: #444;    /* fondo gris oscuro */
+  			filter: grayscale(100%);   /* escala de grises total */
+		}
 
 		.controls-list {
 			display: flex;
@@ -273,6 +280,33 @@
 			color: #aaa;
 		}
 
+		#achievementsOverlay .grid > div:nth-child(-n+6) {
+			border-bottom: 1px solid #666;
+			padding-bottom: 4px;
+		}
+
+		#ver-logros, #ver-logros-victoria {
+			transition: background-color 0.2s ease;
+		}
+
+		.scrollable-content {
+			max-height: 90vh;
+			overflow-y: auto;
+			padding-right: 1rem; /* espacio para la barra */
+		}
+		.scrollable-content::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.scrollable-content::-webkit-scrollbar-thumb {
+			background-color: #888;
+			border-radius: 4px;
+		}
+		.scrollable-content::-webkit-scrollbar-thumb:hover {
+			background-color: #555;
+		}
+
+
   	</style>
 </head>
 
@@ -283,17 +317,25 @@
 			<div class="bg-gray-800 p-8 rounded-lg text-white space-y-4 text-center w-64">
 				<h1 class="text-3xl font-bold">NÁVEX</h1>
 				<button id="btnPlay" class="menu-button bg-blue-600 hover:bg-blue-500 w-full">Jugar</button>
+				<button id="btnPlayInfinite" class="menu-button bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed w-full">Jugar ∞</button>
 				<button id="btnControls" class="menu-button bg-green-600 hover:bg-green-500 w-full">Controles</button>
 				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido OFF</button>
 				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
+				<div class="mt-4 text-gray-400 text-xs">
+					<p>De Álex y David (López)</p>
+					<p>Versión 0.29 (alfa)</p>
+				</div>
+			
 			</div>
 		</div>
 
 		<!-- >>>>>> OVERLAY CONTROLES <<<<<< -->
 		<div id="controlsOverlay" class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-[32rem]">
-				<h2 class="text-xl mb-4 text-center">CONTROLES</h2>
-
+			<div class="bg-gray-800 p-6 rounded-lg text-white w-[32rem] max-h-[90vh] overflow-y-auto scrollable-content">
+				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
+				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
+				scrollable-content → nombre del estilo CSS usado-->
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">CONTROLES</h2>
 				<div class="controls-list">
 					<div class="controls-row">
 						<span class="controls-key">
@@ -328,31 +370,132 @@
 							<kbd class="key-badge">←</kbd> / <kbd class="key-badge">↑</kbd> / <kbd class="key-badge">→</kbd>
 						</span>
 						<span class="controls-desc">Elegir respuesta a las preguntas</span>
-					</div>
+					</div>				
+					<hr class="my-4 border-gray-600">
+					<p class="text-xl text-gray-300 mb-2 text-center">
+					<span class="text-yellow-400">OBJETIVO:</span> Destruye enemigos y recolecta objetos para alcanzar la puntuación del nivel.
+					</p>
+					<!--<hr class="my-4 border-gray-600">-->
+					<p class="text-xl text-gray-300 mb-2 text-center">
+					Supera todos los niveles del juego para desbloquear el Modo Infinito (<span class="text-yellow-400">Jugar ∞</span>)
+					</p>
+
 				</div>
 				<button onclick="hideControls()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
 			</div>
 		</div>
 
 		<!-- >>>>>> OVERLAY LOGROS <<<<<< -->
-		<div id="achievementsOverlay" class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-64">
-			<h2 class="text-xl mb-4">Logros</h2>
-			<p>Próximamente: tus records y medallas.</p>
-			<button onclick="hideAchievements()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
+		<div id="achievementsOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  			<!-- <div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">-->
+			<div class="bg-gray-800 p-6 rounded-lg text-white w-[42rem] max-h-[90vh] overflow-y-auto scrollable-content">
+				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
+				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
+				scrollable-content → nombre del estilo CSS usado-->
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO CAMPAÑA</h2>
+
+				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
+					<!-- Fila 1:  Encabezado -->
+					<div></div> <!-- celda vacía -->
+					<div class="font-semibold">Tiempo</div>
+					<div class="font-semibold">Preguntas</div>
+					<div class="font-semibold">Aciertos</div>
+					<div class="font-semibold">Fallos</div>
+					<div class="font-semibold">Nivel</div>
+
+					<!-- Fila 2: Última partida -->
+					<div class="font-semibold  whitespace-nowrap" style="color: cyan;">Última partida</div>
+					<div id="achvTime">—:—</div>
+					<div id="achvAnswers">0</div>
+					<div id="achvCorrects">0 (0%)</div>
+					<div id="achvFails">0 (0%)</div>
+					<div id="achvLevel">—</div>
+
+					<!-- Fila 3: Mejor tiempo -->
+					<div id="recBestTimeName" style="color: cyan;"></div>
+					<div id="recBestTimeTime"><strong>—:—</strong></div>
+					<div id="recBestTimeQuestions">—</div>
+					<div id="recBestTimeCorrects">—</div>
+					<div id="recBestTimeFails">—</div>
+					<div id="recBestTimeLevel">—</div>
+
+					<!-- Fila 4: Más aciertos -->
+					<div id="recBestCorrName" style="color: cyan;"></div>
+					<div id="recBestCorrTime">—:—</div>
+					<div id="recBestCorrQuestions">—</div>
+					<div id="recBestCorrCorrects"><strong>—</strong></div>
+					<div id="recBestCorrFails">—</div>
+					<div id="recBestCorrLevel">—</div>
+				</div>
+				<br>
+
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO INFINITO</h2>
+				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
+					<div></div> <div class="font-semibold">Tiempo</div>
+					<div class="font-semibold">Preguntas</div>
+					<div class="font-semibold">Aciertos</div>
+					<div class="font-semibold">Fallos</div>
+					<div class="font-semibold">Puntuación</div>
+
+					<div class="font-semibold whitespace-nowrap" style="color: cyan;">Última partida ∞</div>
+					<div id="achvInfTime">—:—</div>
+					<div id="achvInfAnswers">0</div>
+					<div id="achvInfCorrects">0 (0%)</div>
+					<div id="achvInfFails">0 (0%)</div>
+					<div id="achvInfScore">0</div>
+
+					<div id="recInfBestTimeName" style="color: cyan;"></div>
+					<div id="recInfBestTimeTime"><strong>—:—</strong></div>
+					<div id="recInfBestTimeQuestions">—</div>
+					<div id="recInfBestTimeCorrects">—</div>
+					<div id="recInfBestTimeFails">—</div>
+					<div id="recInfBestTimeScore">—</div>
+
+					<div id="recInfBestCorrName" style="color: cyan;"></div>
+					<div id="recInfBestCorrTime">—:—</div>
+					<div id="recInfBestCorrQuestions">—</div>
+					<div id="recInfBestCorrCorrects"><strong>—</strong></div>
+					<div id="recInfBestCorrFails">—</div>
+					<div id="recInfBestCorrScore">—</div>
+
+					<div id="recInfBestScoreName" style="color: cyan;"></div>
+					<div id="recInfBestScoreTime">—:—</div>
+					<div id="recInfBestScoreQuestions">—</div>
+					<div id="recInfBestScoreCorrects">—</div>
+					<div id="recInfBestScoreFails">—</div>
+					<div id="recInfBestScoreScore"><strong>—</strong></div>
+				</div>
+				<br>
+
+				<h2 class="text-xl mb-4 text-center" style="color: gold;">LOGROS</h2>
+				<div id="medallas" class="mt-6 space-y-4">
+					<div class="flex items-center">
+						<img id="medalla-aciertos_10" src="" alt="medalla-aciertos_10" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 10 preguntas.</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-aciertos_25" src="" alt="medalla-aciertos25" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 25 preguntas SIN fallar ninguna</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-aciertos_50" src="" alt="medalla-aciertos_50" class="w-12 h-12 mr-4">
+						<span>Responde correctamente 50 preguntas.</span>
+					</div>
+					<div class="flex items-center">
+						<img id="medalla-veloz" src="" alt="medalla-veloz" class="w-12 h-12 mr-4">
+						<span>Completa el juego en menos de 10 minutos</span>
+					</div>
+				</div>
+
+				<button onclick="hideAchievements()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">
+					Volver
+				</button>
 			</div>
 		</div>
 
 
 		<!-- HUD -->
 		<div id="hud">
-			<!-- <div class="row1">
-				<div id="lives"></div>
-				<div>
-					<div id="score"></div>
-					<div id="levelIndicator"></div>
-				</div>
-			</div>-->
 			<div class="row1">
 				<div id="lives"></div>
 				<div id="scoreLevel" style="display:flex; gap:12px; align-items:center;">
@@ -364,6 +507,7 @@
 			<div class="row2">
 				<div id="quizStats">Aciertos: 0 | Fallos: 0</div>
 				<div class="hud-right">
+					<span id="debugIcon" class="select-none text-white text-2xl ml-4">🔧</span>					
 					<span id="time">🕒 00:00</span>
 					<span id="muteIcon" class="select-none text-white text-2xl ml-4">🔊</span>
 				</div>
@@ -392,9 +536,10 @@
 
 		<!-- Game Over -->
 		<div id="gameOverScreen" class="endScreen">
-			<div>¡Juego terminado!</div>
+			<div>¡Te han eliminado!</div>
 			<div id="endStats" class="stats"></div>
 			<button id="restartBtn">Volver a empezar</button>
+			<button id="ver-logros" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
   			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
@@ -403,6 +548,7 @@
 			<div>🎉 ¡Has ganado!</div>
 			<div id="endStatsWin" class="stats"></div>
 			<button id="restartWinBtn">Volver a empezar</button>
+			<button id="ver-logros-victoria" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
 			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
@@ -422,6 +568,20 @@
   	</div>
 
   	<script>
+		// DEBUG ------
+		let inmortal = false;
+		let qPressCount = 0;
+        let lastQPressTime = 0;
+		let debugMode = false
+		//-------------
+
+		// Variables para el modo infinito
+		let isInfiniteMode = false;
+		let nextShipSpawnTime = null;    
+		let nextSatelliteSpawnTime = null;
+		let lastGameWasInfinite = false;
+		let campaignDone = false;
+
 		// ===== Carga de imágenes =====
 		const playerImage     = new Image();
 		playerImage.src       = "Imágenes/nave.png";
@@ -453,6 +613,89 @@
 		absorberSatImage.src = "Imágenes/Satélite3b.png";
 		const mirrorImage = new Image();
 		mirrorImage.src   = "Imágenes/naveEspejo.png";
+		const imagePaths = {
+			medallas: {
+				aciertos_10: "Imágenes/medalla02.png",
+				aciertos_25: "Imágenes/medalla01.png",
+				aciertos_50: "Imágenes/medalla05.png",
+				veloz: "Imágenes/medalla07.png"
+			}
+		};
+		let medallasEstado = {
+			aciertos_10: false,
+			aciertos_25: false,
+			aciertos_50: false,
+			veloz: false
+		};
+
+		// Cargar logros conseguidos desde localStorage si existe
+		const guardado = localStorage.getItem("medallasEstado");
+		if (guardado) {
+			try {
+				medallasEstado = JSON.parse(guardado);
+			} catch (e) {
+				console.warn("Error al cargar medallas guardadas:", e);
+			}
+		}
+		// Modo campaña
+		let bestTimeRecord = JSON.parse(localStorage.getItem("bestTimeRecord")) || null;
+		let bestCorrectsRecord = JSON.parse(localStorage.getItem("bestCorrectsRecord")) || null;
+		// Modo Infinito
+		let bestTimeRecordInfinite = JSON.parse(localStorage.getItem("bestTimeRecordInfinite")) || null;
+		let bestCorrectsRecordInfinite = JSON.parse(localStorage.getItem("bestCorrectsRecordInfinite")) || null;
+		let bestScoreRecordInfinite = JSON.parse(localStorage.getItem("bestScoreRecordInfinite")) || null;
+		// Records por defecto en modo campaña si aún no hay ninguno
+		if (!bestTimeRecord) {
+			bestTimeRecord = {
+				name: "TORTUGA",
+				stats: {
+					timeSec: 1818,         // tiempo alto para que sea fácil de superar
+					answers: 0,
+					corrects: 0,
+					correctPct: 0,
+					fails: 0,
+					failPct: 0,
+					level: 11
+				}
+			};
+		}
+		if (!bestCorrectsRecord) {
+			bestCorrectsRecord = {
+				name: "Listillo",
+				stats: {
+					timeSec: 652,
+					answers: 0,
+					corrects: 3,
+					correctPct: 60,
+					fails: 2,
+					failPct: 40,
+					level: 3
+				}
+			};
+		}
+		// Records por defecto para el modo infinito  si aún no hay ninguno
+		if (!bestTimeRecordInfinite) {
+			bestTimeRecordInfinite = {
+				name: "Superviviente",
+				stats: { timeSec: 60, answers: 2, corrects: 1, correctPct: 50, fails: 1, failPct: 50, score: 2500 }
+			};
+		}
+		if (!bestCorrectsRecordInfinite) {
+			bestCorrectsRecordInfinite = {
+				name: "Sabiondo",
+				stats: { timeSec: 30, answers: 5, corrects: 4, correctPct: 80, fails: 1, failPct: 20, score: 1000 }
+			};
+		}
+		if (!bestScoreRecordInfinite) {
+			bestScoreRecordInfinite = {
+				name: "Avaro",
+				stats: { timeSec: 30, answers: 1, corrects: 0, correctPct: 0, fails: 1, failPct: 100, score: 3000 }
+			};
+		}
+
+		// Icono para indicar si se pueden usar los trucos para debug (o cheat)
+		const debugIcon = document.getElementById("debugIcon");	
+		debugIcon.classList.add("hidden");	// Inicialmente oculto
 
 		// Audio
 		let muted = true;// Empezamos con el sonido apagado
@@ -481,6 +724,7 @@
 		const rockSpeed  = 3;
 		const bulletSpeed = 7;
 		let extraLives = 0;   // 0–3, solo se llena en Nivel 11
+		let gameWon = false		// Bandera para indicar si se ha acabado el último nivel
 
 		let currentLevel = 0;
 		const levels = [
@@ -631,6 +875,19 @@
 				satelliteRate: 0,
 				blindSatRate: 0,
 				absorberSatRate: 0.005
+			},
+			{
+				goal: Infinity,
+				message: 'Modo ∞',
+				visuals: [
+					{ img: playerImage, text: '¡De todo!' }
+				],
+				rockRate:       0.03,
+				strongProb:     0.5,
+				cometRate:      0.005,
+				satelliteRate:  0.001,
+				blindSatRate:   0.001,
+				absorberSatRate:0.001
 			}
 
 
@@ -743,10 +1000,30 @@
 		const controlsOverlay   = document.getElementById("controlsOverlay");
 		const achievementsOverlay = document.getElementById("achievementsOverlay");
 		const btnPlayMenu       = document.getElementById("btnPlay");
+		const btnPlayInfinite = document.getElementById("btnPlayInfinite");
 		const btnControlsMenu   = document.getElementById("btnControls");
 		const btnSoundMenu      = document.getElementById("btnSoundMenu");
 		const btnAchievements   = document.getElementById("btnAchievements");
 		const btnBackToMenu     = document.querySelectorAll("#btnMenu"); // gameOver + win
+
+		let lastRun = {
+			level: 0,
+			timeSec: 0,
+			answers: 0,
+			corrects: 0,
+			fails: 0,
+			correctPct: 0,
+			failPct: 0
+		};
+		let lastRunInfinite = {
+			timeSec: 0,
+			answers: 0,
+			corrects: 0,
+			fails: 0,
+			correctPct: 0,
+			failPct: 0,
+			score: 0
+		};
 
 		// ===== MENÚ =====
 		// Ocultar/mostrar helpers
@@ -755,7 +1032,13 @@
 			// pausa y resetea el juego
 			gameRunning = false;
 			resetEntities();
+
+			// comprobar si está desbloqueado el modo infinito
+			refreshInfiniteButton();
+			// campaignDone = localStorage.getItem("campaignCompleted") === "true";
+			// btnPlayInfinite.disabled = !campaignDone;
 		}
+
 		function hideMainMenu() {
 			mainMenu.classList.add("hidden");
 			gameRunning = true;
@@ -765,14 +1048,17 @@
 		}
 		function showControls() { controlsOverlay.classList.remove("hidden"); }
 		function hideControls() { controlsOverlay.classList.add("hidden"); }
-		function showAchievements() { achievementsOverlay.classList.remove("hidden"); }
+		function showAchievements() { 
+			captureLastRun();   
+  			checkRecords();
+			updateAchievementsOverlay();
+			updateAchievementsOverlayInfinite();
+			actualizarMedallas();
+			achievementsOverlay.classList.remove("hidden"); 
+		}
 		function hideAchievements() { achievementsOverlay.classList.add("hidden"); }
 
 		// Botones del menú
-		btnPlayMenu.onclick = () => {
-			hideMainMenu();
-		};
-
 		btnControlsMenu.onclick = () => {
 			showControls();
 		};
@@ -791,23 +1077,12 @@
 		// "Menú Principal" tras Game Over o Win
 		btnBackToMenu.forEach(b => {
 			b.onclick = () => {
-				// reset de estado de juego
-				lives        = maxLives;
+				// reset de variables
+				resetBasicVariables();
+				isInfiniteMode = false;
 				extraLives   = 0; // si usas vidas extra en nivel 11
-				score        = 0;
-				shotGrade    = 0;
 				currentLevel = 0;
 				scoreGoal    = levels[0].goal;
-				quizCorrects = 0;
-				quizFails    = 0;
-				startTime    = Date.now();
-				gameRunning  = false;
-				paused       = false;
-				levelActive  = false;
-				quizActive   = false;
-				player.shieldLevel = 0;
-				player.lastHitTime = 0;
-				player.flashTime   = 0;
 
 				resetPlayer();
 				resetEntities();
@@ -825,25 +1100,36 @@
 			};
 		});
 
-
 		btnPlayMenu.onclick = () => {
-			hideMainMenu();
+			resetBasicVariables();
+			isInfiniteMode = false; 	// Desactivamos modo infinito
+			hideMainMenu();				// cerramos menú
 			startBackgroundMusic();
 			requestAnimationFrame(gameLoop);
 		};
 
-		// ===== HUD =====
-		function updateLivesDisplay(){
-			const div = document.getElementById("lives");
-			div.innerHTML = "";
-			for(let i=0;i<maxLives;i++){
-				const s = document.createElement("span");
-				s.className = "heart" + (i>=lives?" empty":"");
-				s.textContent = "❤️";
-				div.appendChild(s);
+		btnPlayInfinite.onclick = () => {
+			campaignDone = localStorage.getItem("campaignCompleted") === "true";
+			if (!campaignDone) {
+				alert("Completa primero todos los niveles para desbloquear el modo infinito");
+				return;
 			}
-		}
+			resetBasicVariables();
+			isInfiniteMode = true; 		// activamos modo infinito
 
+			// Apunta al nivel infinito (es el último del array)
+			currentLevel = levels.length - 1;
+			// Nunca se cumple score ≥ Infinity
+			scoreGoal    = Infinity;
+
+			startTime      = Date.now();         // iniciamos cronómetro
+			hideMainMenu();                      // cerramos menú
+			startBackgroundMusic();
+			requestAnimationFrame(gameLoop);
+		};
+
+
+		// ===== HUD =====
 		function updateLivesDisplay(){
 			const div = document.getElementById("lives");
 			div.innerHTML = "";
@@ -869,28 +1155,23 @@
 		}
 
 		function updateHUD(){
-			document.getElementById("score").textContent =
-				`${score} / ${scoreGoal}`;
+			if (isInfiniteMode) {
+				document.getElementById("score").textContent = `${score}`;
+			} else {
+				document.getElementById("score").textContent = `${score} / ${scoreGoal}`;
+			}
+
 			const elapsed = Math.floor((Date.now()-startTime)/1000);
 			const mm = String(Math.floor(elapsed/60)).padStart(2,"0");
 			const ss = String(elapsed%60).padStart(2,"0");
-			document.getElementById("time").textContent =
-				`🕒 ${mm}:${ss}`;
-			document.getElementById("levelIndicator").textContent =
-				`Nivel ${currentLevel + 1}`;
-			document.getElementById("quizStats").textContent =
-				`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("time").textContent =`🕒 ${mm}:${ss}`;
+			//document.getElementById("levelIndicator").textContent =	`Nivel ${currentLevel + 1}`;
 
-			//Indicar tipo de disparo
-			// let gradeLabel;
-			// switch (SHOT_GRADES[shotGrade].type) {
-			// 	case "simple":
-			// 		gradeLabel = `Simple (${shotGrade + 1})`; break;
-			// 	case "double":
-			// 		gradeLabel = "Doble"; break;
-			// 	case "quadruple":
-			// 		gradeLabel = "Cuádruple"; break;
-			// }
+			const levelLabel = isInfiniteMode ? "∞" : `Nivel ${currentLevel+1}`;
+			document.getElementById("levelIndicator").textContent = levelLabel;
+
+			document.getElementById("quizStats").textContent =`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+
 		}
 
 		// ===== Overlay nivel =====
@@ -1395,12 +1676,8 @@
 				const shake = Math.sin(e.oscill) * 4;
 				const px = e.x + shake, py = e.y;
 				ctx.drawImage(enemyImage, px, py, e.width, e.height);
-				// vida
-				ctx.fillStyle = "#444";
-				ctx.fillRect(px, py - 8, e.width, 6);
-				const ratio = e.hp / e.hpIni;
-				ctx.fillStyle = "red";
-				ctx.fillRect(px, py - 8, e.width * ratio, 6);
+
+				drawHealthBar(e); // Dibuja la barra de vida (roja por defecto)
 			});
 		}		
 
@@ -1436,11 +1713,7 @@
 
 				ctx.drawImage(laserImage, xPos, s.y, s.w, s.h);
 
-				// barra de vida
-				ctx.fillStyle = "#444";
-				ctx.fillRect(xPos, s.y - 8, s.w, 6);
-				ctx.fillStyle = "lime";
-				ctx.fillRect(xPos, s.y - 8, s.w * (s.hp / s.hpIni), 6);
+				drawHealthBar(s, "lime");	// Dibuja la barra de vida
 			});
 		}
 
@@ -1918,7 +2191,7 @@
 				}
 			}
 
-			requestAnimationFrame(gameLoop);
+			//requestAnimationFrame(gameLoop);
 		}
 
 		function quizLoop(){
@@ -1985,6 +2258,7 @@
 							enemies.splice(ei, 1);
 							score += POINTS.basicEnemy;
 
+
 							// Sonido de explosión
 							if (!muted) {
 								playExplosionShipSound();
@@ -2004,11 +2278,17 @@
 								text: '+' + POINTS.basicEnemy,
 								alpha: 1
 							});
+
 							//Hace aparecer otra nave para reemplazar la sustituida
-							if (Math.random()<0.5){
-								spawnEnemy("left");
-							}else{
-								spawnEnemy("right");
+							
+							if (isInfiniteMode) { // Modo infinito
+								nextShipSpawnTime = Date.now() + 2000; 
+							}else{ // Modo campaña
+								if (Math.random()<0.5){
+									spawnEnemy("left");
+								}else{
+									spawnEnemy("right");
+								}
 							}
 						}
 						break;
@@ -2046,7 +2326,9 @@
 								y:s.y, 
 								text:"+" + POINTS.laser, 
 								alpha:1
-								});
+							});
+
+							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
 						}
 						break;
 					}
@@ -2056,7 +2338,7 @@
 				for (let li=fractalShips.length-1; li>=0; li--){
 					const s = fractalShips[li];
 					if (b.x< s.x+s.w && b.x+4> s.x && b.y< s.y+s.h && b.y+10> s.y) {
-						fractalBullets.splice(bi,1);
+						bullets.splice(bi,1);
 						s.hp--;
 						s.oscill = 10;
 						if(s.hp<=0){
@@ -2083,7 +2365,9 @@
 								y:s.y, 
 								text:"+" + POINTS.fractal, 
 								alpha:1
-								});
+							});
+
+							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
 						}
 						break;
 					}
@@ -2211,6 +2495,8 @@
 								text:"+" + POINTS.satellite, 
 								alpha:1
 							});
+
+							if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 						}
 					}
 				});
@@ -2230,7 +2516,6 @@
 							playExplosionSatelliteSound();
 						}
 
-
 						// Efecto explosión
 						explosions.push({
 							x: s.x + s.size/2,
@@ -2247,6 +2532,8 @@
 							text:   "+" + POINTS.satellite,
 							alpha:  1
 						});
+
+						if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 					}
 				});
 
@@ -2554,19 +2841,63 @@
 
 
 			// DEBUG:-----------------
-			if(e.code==="KeyD") shotGrade = 4;
-			if(e.code==="KeyE") player.shieldLevel = 3;
-			if (e.code === "KeyL" && currentLevel < levels.length - 1) {
-				// Limpia entidades
-				resetEntities();
+			if (e.code === "KeyQ") {// Comprueba si se ha pulsado la tecla "Q" 3 veces para activar "cheats"
+				const now = Date.now();
 
-				// Avanza de nivel
-				currentLevel++;
-				score = 0;
-				scoreGoal = levels[currentLevel].goal;
-				updateHUD();
-				showLevelOverlay();
+				// Resetea el contador si ha pasado más de 1 segundo desde la última vez
+				if (now - lastQPressTime > 1000) {
+					qPressCount = 0;
+				}
+
+				// Incrementa el contador y actualiza el tiempo
+				qPressCount++;
+				lastQPressTime = now;
+
+				// Si el contador llega a 3, muestra el mensaje y resetea
+				if (qPressCount === 3) {
+					debugMode = !debugMode
+
+					//const debugIcon = document.getElementById("debugIcon");
+					if (debugMode) {
+						debugIcon.classList.remove("hidden");
+					} else {
+						debugIcon.classList.add("hidden");
+					}
+				}
+			} else {
+				// Si se pulsa cualquier otra tecla, se rompe la secuencia
+				qPressCount = 0;
 			}
+
+			if(e.code==="KeyD") {
+				if (debugMode ){
+					shotGrade = 4;
+				}
+			}
+			if(e.code==="KeyE") {
+				if (debugMode ){
+					player.shieldLevel = 3;
+				}
+			}
+			if (e.code === "KeyL" && currentLevel < 10) {
+				if (debugMode ){
+					// Limpia entidades
+					resetEntities();
+
+					// Avanza de nivel
+					currentLevel++;
+					score = 0;
+					scoreGoal = levels[currentLevel].goal;
+					updateHUD();
+					showLevelOverlay();
+				}
+			};
+
+			if(e.code==="KeyI") {
+				if (debugMode ){
+					inmortal = !inmortal;
+				}
+			};
 			// -------------------------
 			
 			keys[e.code] = true;
@@ -2746,10 +3077,46 @@
 		// ===== Pantallas de fin de juego =====
 		function showGameOver(){
 			gameRunning = false;
-			document.getElementById("endStats").textContent =
-				`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			lastGameWasInfinite = isInfiniteMode;	//Si se ha perdido jugando al modo campaña o al modo infinito
+			captureLastRun();	// Graba los resultados de esta partida
+			if (isInfiniteMode) {
+				checkInfiniteRecords(); // Comprueba récords del modo infinito
+			} else {
+				checkRecords(); // Comprueba récords del modo campaña
+			}
+			checkAchivements();	// Comprueba si se ha obtenido algún logro
+			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
+
+			//Datos por pantalla:
+			document.getElementById("endStats").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 			document.getElementById("gameOverScreen").style.display = "flex";
+			document.getElementById("ver-logros").onclick = () => { showAchievements();	};
 		}
+
+		function showWin(){
+			gameRunning = false;
+			captureLastRun();	// Graba los resultados de esta partida
+			if (isInfiniteMode) {
+				checkInfiniteRecords(); // Comprueba récords del modo infinito
+			} else {
+				localStorage.setItem("campaignCompleted", "true");
+				btnPlayInfinite.disabled = false;	// Reactivar botón
+				refreshInfiniteButton();
+
+				checkRecords(); // Comprueba récords del modo campaña
+			}
+			checkAchivements();	// Comprueba si se ha obtenido algún logro
+			actualizarMedallas();	//Mostrar las medallas (logros) conseguidas
+
+			//Datos por pantalla:
+			document.getElementById("endStatsWin").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("winScreen").classList.add("win");
+			document.getElementById("winScreen").style.display = "flex";
+			document.getElementById("ver-logros-victoria").onclick = () => { showAchievements();	};
+
+			startCelebration();
+		}
+
 		function resizeCanvas() {
 			confettiCanvas.width  = canvas.width;
 			confettiCanvas.height = canvas.height;
@@ -2840,32 +3207,21 @@
 			victoryMusic.pause();
 		}
 
-		function showWin(){
-			gameRunning = false;
-			document.getElementById("endStatsWin").textContent =
-		 		`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
-			document.getElementById("winScreen").classList.add("win");
-			document.getElementById("winScreen").style.display = "flex";
-			startCelebration();
-		}
-
 		function restartGame(){
 			// Reset variables 
-			lives        = maxLives;
-			score        = 0;
-			shotGrade    = 0;
-			currentLevel = 0;
-			scoreGoal    = levels[0].goal;
-			quizCorrects = 0;
-			quizFails    = 0;
-			startTime    = Date.now();
-			gameRunning  = true;
-			paused       = false;
-			levelActive  = false;
-			quizActive   = false;
-			player.shieldLevel = 0;
-			player.lastHitTime = 0;
-			player.flashTime   = 0;
+			resetBasicVariables();
+
+			if (lastGameWasInfinite) {
+				// Configuración para reiniciar en MODO INFINITO
+				isInfiniteMode = true;
+				currentLevel = levels.length - 1; // Apunta al último nivel (el infinito)
+				scoreGoal    = Infinity;
+			} else {
+				// Configuración para reiniciar en MODO CAMPAÑA 
+				isInfiniteMode = false;
+				currentLevel = 0;
+				scoreGoal    = levels[0].goal;
+			}
 
 			// Reiniciar estado del jugador
 			resetPlayer();
@@ -2948,6 +3304,8 @@
 				const s = satellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					satellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -2961,6 +3319,8 @@
 				const s = blindSatellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					blindSatellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -2977,6 +3337,8 @@
 				const s = absorberSatellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					absorberSatellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -3017,7 +3379,22 @@
 			mirrorDefeated = false;
 			mirrorLastShot = 0;
 			mirrorBullets.length = 0;
+		}
 
+		function resetBasicVariables() {
+			lives        = maxLives;
+			score        = 0;
+			shotGrade    = 0;
+			quizCorrects = 0;
+			quizFails    = 0;
+			startTime    = Date.now();
+			gameRunning  = true;
+			paused       = false;
+			levelActive  = false;
+			quizActive   = false;
+			player.shieldLevel = 0;
+			player.lastHitTime = 0;
+			player.flashTime   = 0;
 		}
 
 		// Funciones de audio
@@ -3062,9 +3439,298 @@
 			if (currentLevel === 10 && extraLives > 0) {
 				extraLives--;
 			} else {
-				lives--;
+				if (!inmortal){
+					lives--;
+				}
 			}
 			updateLivesDisplay();
+		}
+
+		function formatMMSS(totalSec) {
+			const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
+			const ss = String(totalSec % 60).padStart(2, "0");
+			return `${mm}:${ss}`;
+		}
+
+		function captureLastRun() {
+			const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
+			const answers = quizCorrects + quizFails;
+			const correctPct = answers > 0 ? Math.round((quizCorrects / answers) * 100) : 0;
+			const failPct = answers > 0 ? 100 - correctPct : 0;
+
+			if (isInfiniteMode) {
+				lastRunInfinite = {
+					timeSec: elapsedSec,
+					answers,
+					corrects: quizCorrects,
+					fails: quizFails,
+					correctPct,
+					failPct,
+					score: score 
+				};
+			} else {
+				lastRun = {
+					level: currentLevel + 1,
+					timeSec: elapsedSec,
+					answers,
+					corrects: quizCorrects,
+					fails: quizFails,
+					correctPct,
+					failPct
+				};
+			}
+		}
+
+		function updateAchievementsOverlay() {
+			// Estadísticas de la última partida
+			document.getElementById("achvLevel").textContent     = lastRun.level;
+			document.getElementById("achvTime").textContent      = formatMMSS(lastRun.timeSec);
+			document.getElementById("achvAnswers").textContent   = lastRun.answers;
+			document.getElementById("achvCorrects").textContent  = `${lastRun.corrects} (${lastRun.correctPct}%)`;
+			document.getElementById("achvFails").textContent     = `${lastRun.fails} (${lastRun.failPct}%)`;
+
+			// DEstadísticas del Mejor tiempo
+			if (bestTimeRecord) {
+				const s = bestTimeRecord.stats;
+				document.getElementById("recBestTimeName").textContent     = bestTimeRecord.name;
+				document.getElementById("recBestTimeTime").innerHTML      = `<strong>${formatMMSS(s.timeSec)}</strong>`;
+				document.getElementById("recBestTimeQuestions").textContent = s.answers;
+				document.getElementById("recBestTimeCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recBestTimeFails").textContent    = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestTimeLevel").textContent    = s.level;
+			}
+
+			// Estadísticas del que tiene Más aciertos
+			if (bestCorrectsRecord) {
+				const s = bestCorrectsRecord.stats;
+				document.getElementById("recBestCorrName").textContent      = bestCorrectsRecord.name;
+				document.getElementById("recBestCorrTime").textContent      = formatMMSS(s.timeSec);
+				document.getElementById("recBestCorrQuestions").textContent = s.answers;
+				document.getElementById("recBestCorrCorrects").innerHTML    = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
+				document.getElementById("recBestCorrFails").textContent     = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestCorrLevel").textContent     = s.level;
+			}
+		}
+
+		function updateAchievementsOverlayInfinite() {
+			// Última partida (Infinito)
+			document.getElementById("achvInfTime").textContent = formatMMSS(lastRunInfinite.timeSec);
+			document.getElementById("achvInfAnswers").textContent = lastRunInfinite.answers;
+			document.getElementById("achvInfCorrects").textContent = `${lastRunInfinite.corrects} (${lastRunInfinite.correctPct}%)`;
+			document.getElementById("achvInfFails").textContent = `${lastRunInfinite.fails} (${lastRunInfinite.failPct}%)`;
+			document.getElementById("achvInfScore").textContent = lastRunInfinite.score;
+
+			// Récord: Mejor tiempo (Infinito) - Más tiempo es mejor
+			if (bestTimeRecordInfinite) {
+				const s = bestTimeRecordInfinite.stats;
+				document.getElementById("recInfBestTimeName").textContent = bestTimeRecordInfinite.name;
+				document.getElementById("recInfBestTimeTime").innerHTML = `<strong>${formatMMSS(s.timeSec)}</strong>`;
+				document.getElementById("recInfBestTimeQuestions").textContent = s.answers;
+				document.getElementById("recInfBestTimeCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recInfBestTimeFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestTimeScore").textContent = s.score;
+			}
+			
+			// Récord: Más aciertos (Infinito)
+			if (bestCorrectsRecordInfinite) {
+				const s = bestCorrectsRecordInfinite.stats;
+				document.getElementById("recInfBestCorrName").textContent = bestCorrectsRecordInfinite.name;
+				document.getElementById("recInfBestCorrTime").textContent = formatMMSS(s.timeSec);
+				document.getElementById("recInfBestCorrQuestions").textContent = s.answers;
+				document.getElementById("recInfBestCorrCorrects").innerHTML = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
+				document.getElementById("recInfBestCorrFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestCorrScore").textContent = s.score;
+			}
+
+			// Récord: Mejor puntuación (Infinito)
+			if (bestScoreRecordInfinite) {
+				const s = bestScoreRecordInfinite.stats;
+				document.getElementById("recInfBestScoreName").textContent = bestScoreRecordInfinite.name;
+				document.getElementById("recInfBestScoreTime").textContent = formatMMSS(s.timeSec);
+				document.getElementById("recInfBestScoreQuestions").textContent = s.answers;
+				document.getElementById("recInfBestScoreCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
+				document.getElementById("recInfBestScoreFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recInfBestScoreScore").innerHTML = `<strong>${s.score}</strong>`;
+			}
+		}
+
+		function actualizarMedallas() {
+			for (const tipo in medallasEstado) {
+				const imgElem = document.getElementById(`medalla-${tipo}`);
+				//if (!imgElem) continue; 
+				imgElem.src = imagePaths.medallas[tipo];
+				if (!medallasEstado[tipo]) {
+					imgElem.style.filter = "grayscale(100%)";
+					imgElem.style.opacity = "0.6";
+				} else {
+					imgElem.style.filter = "none";
+					imgElem.style.opacity = "1";
+				}
+			}
+		}
+
+		function checkAchivements() {
+			if (quizCorrects >= 10 && !medallasEstado.aciertos_10) {
+				medallasEstado.aciertos_10 = true;
+			}
+
+			if (quizCorrects >= 25 && quizFails == 0 && !medallasEstado.aciertos_25) {
+				medallasEstado.aciertos_25 = true;
+			}
+
+			if (quizCorrects >= 50 && !medallasEstado.aciertos_50) {
+				medallasEstado.aciertos_50 = true;
+			}
+
+			if (lastRun.timeSec < 600 && gameWon && !medallasEstado.veloz) {
+				medallasEstado.veloz = true;
+			}
+
+			// Guardar en localStorage
+			localStorage.setItem("medallasEstado", JSON.stringify(medallasEstado));
+		}
+
+		function checkRecords() {
+			// --- Mejor tiempo (buscamos tiempo menor) ---
+			if (gameWon){
+				if (!bestTimeRecord || lastRun.timeSec < bestTimeRecord.stats.timeSec) {
+					const name = prompt("¡¡¡Nuevo récord de TIEMPO!!!: Escribe tu nombre!");
+					bestTimeRecord = { name: name || "—", stats: { ...lastRun } };
+					localStorage.setItem("bestTimeRecord", JSON.stringify(bestTimeRecord));
+				}
+			}
+
+			// --- Más aciertos (si hat empate, se desempata por % aciertos) ---
+			const currentCorrects = lastRun.corrects;
+			const currentPct = lastRun.correctPct;
+			if (!bestCorrectsRecord
+				|| currentCorrects > bestCorrectsRecord.stats.corrects
+				|| (currentCorrects === bestCorrectsRecord.stats.corrects
+					&& currentPct > bestCorrectsRecord.stats.correctPct)) {
+				const name = prompt("¡¡¡Nuevo récord de ACIERTOS!!!: Escribe tu nombre!");
+				bestCorrectsRecord = { name: name || "—", stats: { ...lastRun } };
+				localStorage.setItem("bestCorrectsRecord", JSON.stringify(bestCorrectsRecord));
+			}
+		}
+
+		function checkInfiniteRecords() {
+			// --- Mejor tiempo (sobrevivir más tiempo) ---
+			if (!bestTimeRecordInfinite || lastRunInfinite.timeSec > bestTimeRecordInfinite.stats.timeSec) {
+				const name = prompt("¡¡¡Nuevo récord de SUPERVIVENCIA!!!\nHas aguantado más tiempo que nadie.\n\nEscribe tu nombre:");
+				bestTimeRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestTimeRecordInfinite", JSON.stringify(bestTimeRecordInfinite));
+			}
+
+			// --- Más aciertos ---
+			const currentCorrects = lastRunInfinite.corrects;
+			const currentPct = lastRunInfinite.correctPct;
+			if (!bestCorrectsRecordInfinite 
+				|| currentCorrects > bestCorrectsRecordInfinite.stats.corrects 
+				|| (currentCorrects === bestCorrectsRecordInfinite.stats.corrects && currentPct > bestCorrectsRecordInfinite.stats.correctPct)) 
+			{
+				const name = prompt("¡¡¡Nuevo récord de ACIERTOS (∞)!!!\nNadie ha acertado tanto en el modo infinito.\n\nEscribe tu nombre:");
+				bestCorrectsRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestCorrectsRecordInfinite", JSON.stringify(bestCorrectsRecordInfinite));
+			}
+
+			// --- Mejor puntuación ---
+			if (!bestScoreRecordInfinite || lastRunInfinite.score > bestScoreRecordInfinite.stats.score) {
+				const name = prompt("¡¡¡Nuevo récord de PUNTUACIÓN (∞)!!!\nLa puntuación más alta hasta la fecha.\n\nEscribe tu nombre:");
+				bestScoreRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
+				localStorage.setItem("bestScoreRecordInfinite", JSON.stringify(bestScoreRecordInfinite));
+			}
+		}
+
+		function spawnRandomInfiniteShip() {
+			const shipTypes = ['basic', 'laser', 'fractal'];
+			const randomType = shipTypes[Math.floor(Math.random() * shipTypes.length)];
+			const side = Math.random() < 0.5 ? "left" : "right";
+
+			switch (randomType) {
+				case 'basic':
+					spawnEnemy(side);
+					break;
+				case 'laser':
+					spawnLaserShip(side);
+					break;
+				case 'fractal':
+					spawnFractalShip(side);
+					break;
+			}
+		}
+
+		function spawnRandomInfiniteSatellite() {
+			const satelliteTypes = ['satellite', 'blindSatellite', 'absorberSatellite'];
+			const randomType = satelliteTypes[Math.floor(Math.random() * satelliteTypes.length)];
+
+			switch (randomType) {
+				case 'satellite':
+					{ 
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 100;
+						const dx = spawnSide === "left" ? 1 : -1;
+						satellites.push({
+							x, y, size, dx, hp: 1,
+							probShot: 0.02
+						});
+					}
+					break;
+				case 'blindSatellite':
+					{
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 100;
+						const dx = spawnSide === "left" ? 1 : -1;
+						let tmin = 4000;
+						let tmax = 6000;
+						blindSatellites.push({
+							x, y, size, dx, hp: 1,
+							nextWaveTime: Date.now() + tmin + Math.random() * (tmax - tmin)
+						});
+					}
+					break;
+				case 'absorberSatellite':
+					{
+						// Asegurarse de que no hay ya uno en pantalla
+						if (absorberSatellites.length > 0) return;
+						const size = 30;
+						const spawnSide = Math.random() < 0.5 ? "left" : "right";
+						const x = spawnSide === "left" ? -size : canvas.width + size;
+						const y = 140;
+						const dx = spawnSide === "left" ? 1 : -1;
+						absorberSatellites.push({
+							x, y, size, dx
+						});
+					}
+					break;
+			}
+		}
+
+		function refreshInfiniteButton() {
+			const unlocked = localStorage.getItem("campaignCompleted") === "true";
+			btnPlayInfinite.disabled = !unlocked;
+
+			// Opcional: aspecto más claro cuando está bloqueado
+			btnPlayInfinite.classList.toggle('bg-blue-700', unlocked);
+			btnPlayInfinite.classList.toggle('hover:bg-blue-600', unlocked);
+			btnPlayInfinite.classList.toggle('bg-gray-700', !unlocked);
+			btnPlayInfinite.classList.toggle('hover:bg-gray-600', !unlocked);
+			//btnPlayInfinite.textContent = unlocked ? 'Jugar ∞' : 'Bloqueado ∞';
+		}
+
+		function drawHealthBar(entity, color = "red") {
+			const barX = entity.x + (entity.oscill ? Math.sin(entity.oscill) * 4 : 0);
+			const barY = entity.y - 8;
+			const barWidth = entity.width || entity.w;
+
+			ctx.fillStyle = "#444";
+			ctx.fillRect(barX, barY, barWidth, 6);
+			const ratio = entity.hp / entity.hpIni;
+			ctx.fillStyle = color;
+			ctx.fillRect(barX, barY, barWidth * ratio, 6);
 		}
 
 		// ===== Game Loop =====
@@ -3076,7 +3742,7 @@
 				return;
 			}
 			if(quizActive){
-				// durante el quiz SOLO corre quizLoop
+				requestAnimationFrame(gameLoop);
 				return;
 			}
 			if(paused){
@@ -3095,21 +3761,57 @@
 			//Comprobar si se ha perdido
 			if(lives<=0){ showGameOver(); return; }
 
-			if(score>=scoreGoal){
-				if(currentLevel<levels.length-1){
-					resetEntities();
 
-					currentLevel++;
-					score     = 0;
-					scoreGoal = levels[currentLevel].goal;
-					updateHUD();
-					showLevelOverlay();
+			if (!isInfiniteMode) {	// Si es el modo de juego normal (modo campaña)
+				if(score>=scoreGoal){
+					if(currentLevel < 10){
+						resetEntities();
 
-					requestAnimationFrame(gameLoop);
-					return;
-				} else {
-					showWin();
-					return;
+						currentLevel++;
+						score     = 0;
+						scoreGoal = levels[currentLevel].goal;
+						updateHUD();
+						showLevelOverlay();
+
+						requestAnimationFrame(gameLoop);
+						return;
+					} else {
+						gameWon = true	
+						showWin();
+						return;
+					}
+				}
+			} else {	// Si es el modo de juego infinito
+				// Comprobar si hay naves enemigas activas
+				const isShipActive = enemies.length > 0 || laserShips.length > 0 || fractalShips.length > 0;
+				
+				// Comprobar si hay satélites activos
+				const isSatelliteActive = satellites.length > 0 || blindSatellites.length > 0 || absorberSatellites.length > 0;
+
+				// Lógica de aparición de NAVES
+				if (!isShipActive) {
+					if (!nextShipSpawnTime) {
+						// Si no hay naves, establece un retardo para la siguiente
+						nextShipSpawnTime = Date.now() + 2000;
+					}
+
+					if (Date.now() >= nextShipSpawnTime) {
+						spawnRandomInfiniteShip();
+						nextShipSpawnTime = null; // Reinicia el temporizador
+					}
+				}
+				
+				// Lógica de aparición de SATÉLITES
+				if (!isSatelliteActive) {
+					if (!nextSatelliteSpawnTime) {
+						// Si no hay satélites, establece un retardo para el siguiente
+						nextSatelliteSpawnTime = Date.now() + 3000;
+					}
+
+					if (Date.now() >= nextSatelliteSpawnTime) {
+						spawnRandomInfiniteSatellite();
+						nextSatelliteSpawnTime = null; // Reinicia el temporizador
+					}
 				}
 			}
 
@@ -3145,90 +3847,134 @@
 			drawExplosions();		// Efecto de explosión (de las entidades que se hayan destruido)
 			drawPopups();			// Efecto de mostrar cantidad de puntos obtenidos en la explosión
 
-			// Nivel 4 (índice 3) → naves enemigas básicas
-			if (currentLevel === 3) {
+			if (isInfiniteMode) {	//Modo infinito
+				// MODO INFINITO: Mueve y dibuja todos los tipos de enemigos posibles.
+				
+				// Cometas (ya que pueden aparecer)
+				if (Math.random() < levels[currentLevel].cometRate) spawnComet();
+				drawComets();
+				
+				// Naves enemigas básicas
 				moveEnemies();
 				updateEnemyShooting();
 				drawEnemies();
 				drawEnemyBullets();
-			}
 
-			// Solo a partir del Nivel 5 (índice 4)
-			if(currentLevel >= 4){
-				if (Math.random() < levels[currentLevel].cometRate) {
-					spawnComet();
-				}
-				drawComets();
-			}
-
-
-			// Nivel 6 (índice 5) → naves láser
-			if (currentLevel === 5){
+				// Naves láser
 				moveLaserShips();
 				updateLaserFiring();
 				drawLaserShips();
 				drawLaserBeams();
-			}
-			
-			// Nivel 7 (índice 6) → nave fractal
-			if (currentLevel === 6){
+
+				// Naves fractales
 				moveFractalShips();
 				updateFractalShooting();
-				updateFractalBullets(); 
+				updateFractalBullets();
 				drawFractalShips();
 				drawFractalBullets();
-			}
-						
-			// Nivel 8 (índice 7) → satélite paralizador
-			if (currentLevel === 7) {
-				spawnSatellite();	// crea satélites
-				moveSatellite();	// Mueve los satélites
-				updateWaveShooting();	// Disparar ondas paralizadoras
-				drawSatellites();	// Dibuja en pantalla los satélites paralizadores
-				drawWaveSlices();	// Dibuja en pantalla las ondas de los satélites
-			}
+				
+				// Satélite paralizador
+				moveSatellite();
+				updateWaveShooting();
+				drawSatellites();
+				drawWaveSlices();
 
-			// Nivel 9 (índice 8) → satélite cegador
-			if (currentLevel === 8) {
-				spawnBlindSatellite();
+				// Satélite cegador
 				moveBlindSatellites();
 				updateBlindWave();
-				drawBlindSatellites();	// Dibuja en pantalla los satélites cegadores
+				drawBlindSatellites();
 				drawBlindWaves();
 
-				moveEnemies();
-				updateEnemyShooting();
-				drawEnemies();
-				drawEnemyBullets();
-			}
-
-			if (currentLevel === 9) { // Nivel 10 (índice 9)
-				spawnAbsorberSatellite();
+				// Satélite absorbedor
 				moveAbsorberSatellites();
 				drawAbsorberSatellites();
 
-				moveEnemies();
-				updateEnemyShooting();
-				drawEnemies();
-				drawEnemyBullets();
+			} else {	// Modo campaña
+				// Nivel 4 (índice 3) → naves enemigas básicas
+				if (currentLevel === 3) {
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+				}
 
-				moveFractalShips();
-				updateFractalShooting();
-				updateFractalBullets(); 
-				drawFractalShips();
-				drawFractalBullets();
-			}
-			
-			if (currentLevel === 10) {  // Nivel 11 - Final (índice 10)
-				spawnMirrorShip();
-				moveMirrorShip();
-				drawMirrorShip();
-				updateMirrorShooting();
-				drawMirrorBullets();
+				// Solo a partir del Nivel 5 (índice 4)
+				if(currentLevel >= 4){
+					if (Math.random() < levels[currentLevel].cometRate) {
+						spawnComet();
+					}
+					drawComets();
+				}
 
-				spawnAbsorberSatellite();
-				moveAbsorberSatellites();
-				drawAbsorberSatellites();
+
+				// Nivel 6 (índice 5) → naves láser
+				if (currentLevel === 5){
+					moveLaserShips();
+					updateLaserFiring();
+					drawLaserShips();
+					drawLaserBeams();
+				}
+				
+				// Nivel 7 (índice 6) → nave fractal
+				if (currentLevel === 6){
+					moveFractalShips();
+					updateFractalShooting();
+					updateFractalBullets(); 
+					drawFractalShips();
+					drawFractalBullets();
+				}
+							
+				// Nivel 8 (índice 7) → satélite paralizador
+				if (currentLevel === 7) {
+					spawnSatellite();	// crea satélites
+					moveSatellite();	// Mueve los satélites
+					updateWaveShooting();	// Disparar ondas paralizadoras
+					drawSatellites();	// Dibuja en pantalla los satélites paralizadores
+					drawWaveSlices();	// Dibuja en pantalla las ondas de los satélites
+				}
+
+				// Nivel 9 (índice 8) → satélite cegador
+				if (currentLevel === 8) {
+					spawnBlindSatellite();
+					moveBlindSatellites();
+					updateBlindWave();
+					drawBlindSatellites();	// Dibuja en pantalla los satélites cegadores
+					drawBlindWaves();
+
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+				}
+
+				if (currentLevel === 9) { // Nivel 10 (índice 9)
+					spawnAbsorberSatellite();
+					moveAbsorberSatellites();
+					drawAbsorberSatellites();
+
+					moveEnemies();
+					updateEnemyShooting();
+					drawEnemies();
+					drawEnemyBullets();
+
+					moveFractalShips();
+					updateFractalShooting();
+					updateFractalBullets(); 
+					drawFractalShips();
+					drawFractalBullets();
+				}
+				
+				if (currentLevel === 10) {  // Nivel 11 - Final (índice 10)
+					spawnMirrorShip();
+					moveMirrorShip();
+					drawMirrorShip();
+					updateMirrorShooting();
+					drawMirrorBullets();
+
+					spawnAbsorberSatellite();
+					moveAbsorberSatellites();
+					drawAbsorberSatellites();
+				}
 			}
 
 			// Comprueba si ciertas entidades (balas, rocas, enemigos...) han entrado en contacto.
@@ -3247,16 +3993,18 @@
 		player.x = canvas.width/2 - player.w/2;
 		player.y = canvas.height - player.h - 20;
 		updateLivesDisplay();
-		//showLevelOverlay();
 		updateHUD();
 		updateMuteIcon();// Inicializamos el icono al arrancar
-		//gameLoop();
 
+		// Oculta Modo ∞ si el modo campaña no está completada
+		//btnPlayInfinite = document.getElementById("btnPlayInfinite");
+		// campaignDone = localStorage.getItem("campaignCompleted") === "true";
+		// if (!campaignDone) {
+		// 	btnPlayInfinite.disabled = true;	// impide el clic.
+		// }
+		refreshInfiniteButton();
 		// Al cargar, mostramos primero el menú principal:
 		showMainMenu();
-
-		
-
   	</script>
 </body>
 </html>

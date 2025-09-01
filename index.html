@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>NÁVEX v.0.28</title>
+  <title>NÁVEX v.0.29</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
   	<style>
@@ -323,7 +323,7 @@
 				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
 				<div class="mt-4 text-gray-400 text-xs">
 					<p>De Álex y David (López)</p>
-					<p>Versión 0.28 (alfa)</p>
+					<p>Versión 0.29 (alfa)</p>
 				</div>
 			
 			</div>
@@ -536,7 +536,7 @@
 
 		<!-- Game Over -->
 		<div id="gameOverScreen" class="endScreen">
-			<div>¡Juego terminado!</div>
+			<div>¡Te han eliminado!</div>
 			<div id="endStats" class="stats"></div>
 			<button id="restartBtn">Volver a empezar</button>
 			<button id="ver-logros" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
@@ -577,7 +577,8 @@
 
 		// Variables para el modo infinito
 		let isInfiniteMode = false;
-		let nextEnemySpawnTime = null;
+		let nextShipSpawnTime = null;    
+		let nextSatelliteSpawnTime = null;
 		let lastGameWasInfinite = false;
 		let campaignDone = false;
 
@@ -1076,24 +1077,12 @@
 		// "Menú Principal" tras Game Over o Win
 		btnBackToMenu.forEach(b => {
 			b.onclick = () => {
-				// reset de estado de juego
+				// reset de variables
+				resetBasicVariables();
 				isInfiniteMode = false;
-				lives        = maxLives;
 				extraLives   = 0; // si usas vidas extra en nivel 11
-				score        = 0;
-				shotGrade    = 0;
 				currentLevel = 0;
 				scoreGoal    = levels[0].goal;
-				quizCorrects = 0;
-				quizFails    = 0;
-				startTime    = Date.now();
-				gameRunning  = false;
-				paused       = false;
-				levelActive  = false;
-				quizActive   = false;
-				player.shieldLevel = 0;
-				player.lastHitTime = 0;
-				player.flashTime   = 0;
 
 				resetPlayer();
 				resetEntities();
@@ -1112,9 +1101,8 @@
 		});
 
 		btnPlayMenu.onclick = () => {
-			restartGame();
+			resetBasicVariables();
 			isInfiniteMode = false; 	// Desactivamos modo infinito
-			//startTime = Date.now();		// iniciamos cronómetro
 			hideMainMenu();				// cerramos menú
 			startBackgroundMusic();
 			requestAnimationFrame(gameLoop);
@@ -1126,9 +1114,8 @@
 				alert("Completa primero todos los niveles para desbloquear el modo infinito");
 				return;
 			}
-			restartGame();
+			resetBasicVariables();
 			isInfiniteMode = true; 		// activamos modo infinito
-			nextEnemySpawnTime = null; 	// reiniciamos el contador de naves enemigas en pantalla
 
 			// Apunta al nivel infinito (es el último del array)
 			currentLevel = levels.length - 1;
@@ -1143,17 +1130,6 @@
 
 
 		// ===== HUD =====
-		function updateLivesDisplay(){
-			const div = document.getElementById("lives");
-			div.innerHTML = "";
-			for(let i=0;i<maxLives;i++){
-				const s = document.createElement("span");
-				s.className = "heart" + (i>=lives?" empty":"");
-				s.textContent = "❤️";
-				div.appendChild(s);
-			}
-		}
-
 		function updateLivesDisplay(){
 			const div = document.getElementById("lives");
 			div.innerHTML = "";
@@ -1700,12 +1676,8 @@
 				const shake = Math.sin(e.oscill) * 4;
 				const px = e.x + shake, py = e.y;
 				ctx.drawImage(enemyImage, px, py, e.width, e.height);
-				// vida
-				ctx.fillStyle = "#444";
-				ctx.fillRect(px, py - 8, e.width, 6);
-				const ratio = e.hp / e.hpIni;
-				ctx.fillStyle = "red";
-				ctx.fillRect(px, py - 8, e.width * ratio, 6);
+
+				drawHealthBar(e); // Dibuja la barra de vida (roja por defecto)
 			});
 		}		
 
@@ -1741,11 +1713,7 @@
 
 				ctx.drawImage(laserImage, xPos, s.y, s.w, s.h);
 
-				// barra de vida
-				ctx.fillStyle = "#444";
-				ctx.fillRect(xPos, s.y - 8, s.w, 6);
-				ctx.fillStyle = "lime";
-				ctx.fillRect(xPos, s.y - 8, s.w * (s.hp / s.hpIni), 6);
+				drawHealthBar(s, "lime");	// Dibuja la barra de vida
 			});
 		}
 
@@ -2290,6 +2258,7 @@
 							enemies.splice(ei, 1);
 							score += POINTS.basicEnemy;
 
+
 							// Sonido de explosión
 							if (!muted) {
 								playExplosionShipSound();
@@ -2309,11 +2278,17 @@
 								text: '+' + POINTS.basicEnemy,
 								alpha: 1
 							});
+
 							//Hace aparecer otra nave para reemplazar la sustituida
-							if (Math.random()<0.5){
-								spawnEnemy("left");
-							}else{
-								spawnEnemy("right");
+							
+							if (isInfiniteMode) { // Modo infinito
+								nextShipSpawnTime = Date.now() + 2000; 
+							}else{ // Modo campaña
+								if (Math.random()<0.5){
+									spawnEnemy("left");
+								}else{
+									spawnEnemy("right");
+								}
 							}
 						}
 						break;
@@ -2351,7 +2326,9 @@
 								y:s.y, 
 								text:"+" + POINTS.laser, 
 								alpha:1
-								});
+							});
+
+							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
 						}
 						break;
 					}
@@ -2361,7 +2338,7 @@
 				for (let li=fractalShips.length-1; li>=0; li--){
 					const s = fractalShips[li];
 					if (b.x< s.x+s.w && b.x+4> s.x && b.y< s.y+s.h && b.y+10> s.y) {
-						fractalBullets.splice(bi,1);
+						bullets.splice(bi,1);
 						s.hp--;
 						s.oscill = 10;
 						if(s.hp<=0){
@@ -2388,7 +2365,9 @@
 								y:s.y, 
 								text:"+" + POINTS.fractal, 
 								alpha:1
-								});
+							});
+
+							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
 						}
 						break;
 					}
@@ -2516,6 +2495,8 @@
 								text:"+" + POINTS.satellite, 
 								alpha:1
 							});
+
+							if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 						}
 					}
 				});
@@ -2535,7 +2516,6 @@
 							playExplosionSatelliteSound();
 						}
 
-
 						// Efecto explosión
 						explosions.push({
 							x: s.x + s.size/2,
@@ -2552,6 +2532,8 @@
 							text:   "+" + POINTS.satellite,
 							alpha:  1
 						});
+
+						if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 					}
 				});
 
@@ -3227,27 +3209,13 @@
 
 		function restartGame(){
 			// Reset variables 
-			
-			lives        = maxLives;
-			score        = 0;
-			shotGrade    = 0;
-			quizCorrects = 0;
-			quizFails    = 0;
-			startTime    = Date.now();
-			gameRunning  = true;
-			paused       = false;
-			levelActive  = false;
-			quizActive   = false;
-			player.shieldLevel = 0;
-			player.lastHitTime = 0;
-			player.flashTime   = 0;
+			resetBasicVariables();
 
 			if (lastGameWasInfinite) {
 				// Configuración para reiniciar en MODO INFINITO
 				isInfiniteMode = true;
 				currentLevel = levels.length - 1; // Apunta al último nivel (el infinito)
 				scoreGoal    = Infinity;
-				nextEnemySpawnTime = null;		// reiniciamos el contador de naves enemigas en pantalla (en el modo infinito)
 			} else {
 				// Configuración para reiniciar en MODO CAMPAÑA 
 				isInfiniteMode = false;
@@ -3336,6 +3304,8 @@
 				const s = satellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					satellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -3349,6 +3319,8 @@
 				const s = blindSatellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					blindSatellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -3365,6 +3337,8 @@
 				const s = absorberSatellites[i];
 				if (s.x + s.size < 0 || s.x > canvas.width + s.size) {
 					absorberSatellites.splice(i, 1);
+
+					if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
 				}
 			}
 
@@ -3405,7 +3379,22 @@
 			mirrorDefeated = false;
 			mirrorLastShot = 0;
 			mirrorBullets.length = 0;
+		}
 
+		function resetBasicVariables() {
+			lives        = maxLives;
+			score        = 0;
+			shotGrade    = 0;
+			quizCorrects = 0;
+			quizFails    = 0;
+			startTime    = Date.now();
+			gameRunning  = true;
+			paused       = false;
+			levelActive  = false;
+			quizActive   = false;
+			player.shieldLevel = 0;
+			player.lastHitTime = 0;
+			player.flashTime   = 0;
 		}
 
 		// Funciones de audio
@@ -3652,33 +3641,31 @@
 			}
 		}
 
-		function spawnRandomInfiniteEnemy() {
-			const enemyTypes = [
-				'basic',
-				'laser',
-				'fractal',
-				'satellite',
-				'blindSatellite',
-				'absorberSatellite'
-			];
-			const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+		function spawnRandomInfiniteShip() {
+			const shipTypes = ['basic', 'laser', 'fractal'];
+			const randomType = shipTypes[Math.floor(Math.random() * shipTypes.length)];
 			const side = Math.random() < 0.5 ? "left" : "right";
 
 			switch (randomType) {
 				case 'basic':
-					// Genera una nave enemiga básica
 					spawnEnemy(side);
 					break;
 				case 'laser':
-					// Genera una nave láser
 					spawnLaserShip(side);
 					break;
 				case 'fractal':
-					// Genera una nave fractal
 					spawnFractalShip(side);
 					break;
+			}
+		}
+
+		function spawnRandomInfiniteSatellite() {
+			const satelliteTypes = ['satellite', 'blindSatellite', 'absorberSatellite'];
+			const randomType = satelliteTypes[Math.floor(Math.random() * satelliteTypes.length)];
+
+			switch (randomType) {
 				case 'satellite':
-					{ // Crea un ámbito local para las variables
+					{ 
 						const size = 30;
 						const spawnSide = Math.random() < 0.5 ? "left" : "right";
 						const x = spawnSide === "left" ? -size : canvas.width + size;
@@ -3707,6 +3694,8 @@
 					break;
 				case 'absorberSatellite':
 					{
+						// Asegurarse de que no hay ya uno en pantalla
+						if (absorberSatellites.length > 0) return;
 						const size = 30;
 						const spawnSide = Math.random() < 0.5 ? "left" : "right";
 						const x = spawnSide === "left" ? -size : canvas.width + size;
@@ -3730,6 +3719,18 @@
 			btnPlayInfinite.classList.toggle('bg-gray-700', !unlocked);
 			btnPlayInfinite.classList.toggle('hover:bg-gray-600', !unlocked);
 			//btnPlayInfinite.textContent = unlocked ? 'Jugar ∞' : 'Bloqueado ∞';
+		}
+
+		function drawHealthBar(entity, color = "red") {
+			const barX = entity.x + (entity.oscill ? Math.sin(entity.oscill) * 4 : 0);
+			const barY = entity.y - 8;
+			const barWidth = entity.width || entity.w;
+
+			ctx.fillStyle = "#444";
+			ctx.fillRect(barX, barY, barWidth, 6);
+			const ratio = entity.hp / entity.hpIni;
+			ctx.fillStyle = color;
+			ctx.fillRect(barX, barY, barWidth * ratio, 6);
 		}
 
 		// ===== Game Loop =====
@@ -3781,24 +3782,35 @@
 					}
 				}
 			} else {	// Si es el modo de juego infinito
-				// Comprobamos si hay alguna nave enemiga o satélite en pantalla
-				const isMajorEnemyActive = enemies.length > 0 ||
-										   laserShips.length > 0 ||
-										   fractalShips.length > 0 ||
-										   satellites.length > 0 ||
-										   blindSatellites.length > 0 ||
-										   absorberSatellites.length > 0;
+				// Comprobar si hay naves enemigas activas
+				const isShipActive = enemies.length > 0 || laserShips.length > 0 || fractalShips.length > 0;
+				
+				// Comprobar si hay satélites activos
+				const isSatelliteActive = satellites.length > 0 || blindSatellites.length > 0 || absorberSatellites.length > 0;
 
-				// Si no hay ninguna nave enemiga o satélite se crea una de forma aleatoria
-				if (!isMajorEnemyActive) {
-					if (!nextEnemySpawnTime) {
-						// Establece un retardo de 2 segundos antes de que aparezca el siguiente enemigo
-						nextEnemySpawnTime = Date.now() + 2000;
+				// Lógica de aparición de NAVES
+				if (!isShipActive) {
+					if (!nextShipSpawnTime) {
+						// Si no hay naves, establece un retardo para la siguiente
+						nextShipSpawnTime = Date.now() + 2000;
 					}
 
-					if (Date.now() >= nextEnemySpawnTime) {
-						spawnRandomInfiniteEnemy();
-						nextEnemySpawnTime = null; // Reinicia el temporizador
+					if (Date.now() >= nextShipSpawnTime) {
+						spawnRandomInfiniteShip();
+						nextShipSpawnTime = null; // Reinicia el temporizador
+					}
+				}
+				
+				// Lógica de aparición de SATÉLITES
+				if (!isSatelliteActive) {
+					if (!nextSatelliteSpawnTime) {
+						// Si no hay satélites, establece un retardo para el siguiente
+						nextSatelliteSpawnTime = Date.now() + 3000;
+					}
+
+					if (Date.now() >= nextSatelliteSpawnTime) {
+						spawnRandomInfiniteSatellite();
+						nextSatelliteSpawnTime = null; // Reinicia el temporizador
 					}
 				}
 			}
