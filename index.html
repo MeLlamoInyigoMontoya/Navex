@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>NÁVEX v.0.29</title>
+	<meta charset="UTF-8" />
+	<title>NÁVEX <v class="1.0 (Beta)"></v></title>
 	<script src="https://cdn.tailwindcss.com"></script>
 
-  	<style>
+	<style>
 		/* ===== Estilos globales ===== */
 		body {
 			margin: 0;
@@ -24,7 +25,7 @@
 			max-width: 800px;
 			height: 100vh;
 			background-color: black;
-			box-shadow: 0 0 20px rgba(255,255,255,0.2);
+			box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 			overflow: hidden;
 		}
 
@@ -37,47 +38,57 @@
 		/* ===== HUD ===== */
 		#hud {
 			position: absolute;
-			top: 10px; left: 0; right: 0;
+			top: 10px;
+			left: 0;
+			right: 0;
 			z-index: 10;
 			color: white;
 			padding: 0 20px;
 		}
+
 		.row1 {
 			display: flex;
 			justify-content: space-between;
 			align-items: flex-end;
 			height: 40px;
 		}
+
 		#lives {
 			display: flex;
 			align-items: flex-end;
 		}
+
 		.heart {
 			font-size: 24px;
 			margin-right: 4px;
 		}
+
 		.heart.empty {
 			opacity: 0.3;
 		}
+
 		#score {
 			font-size: 26px;
 			color: gold;
 			line-height: 1;
 		}
+
 		#levelIndicator {
 			font-size: 16px;
 			color: #aaa;
 			margin-top: 2px;
 		}
+
 		.row2 {
 			display: flex;
 			justify-content: space-between;
-			align-items: center; 
+			align-items: center;
 			margin-top: 4px;
 			font-size: 16px;
 			padding: 0 20px;
 			color: #ccc;
 		}
+
 		.hud-right {
 			display: flex;
 			align-items: center;
@@ -88,11 +99,13 @@
 		/* ===== Overlay de nivel ===== */
 		#levelOverlay {
 			position: absolute;
-			top: 0; left: 0;
-			width: 100%; height: 100%;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
 			background: radial-gradient(circle at center,
-						rgba(0,0,0,0.9),
-						rgba(0,0,0,1));
+					rgba(0, 0, 0, 0.9),
+					rgba(0, 0, 0, 1));
 			display: none;
 			z-index: 20;
 			flex-direction: column;
@@ -101,17 +114,20 @@
 			text-align: center;
 			padding: 20px;
 		}
+
 		#levelOverlay h1 {
 			font-size: 48px;
 			color: #ff0;
 			text-shadow: 2px 2px 8px #000;
 			margin: 0;
 		}
+
 		#levelOverlay p {
 			font-size: 24px;
 			color: #ccc;
 			margin-top: 8px;
 		}
+
 		#levelVisuals {
 			margin-top: 30px;
 			display: flex;
@@ -119,9 +135,12 @@
 			gap: 12px;
 			align-items: center;
 		}
+
 		#levelVisuals img {
-			width: 40px; height: 40px;
+			width: 40px;
+			height: 40px;
 		}
+
 		#levelVisuals .item {
 			display: flex;
 			align-items: center;
@@ -133,9 +152,11 @@
 		/* ===== Overlay de quiz ===== */
 		#quizOverlay {
 			position: absolute;
-			top: 0; left: 0;
-			width: 100%; height: 100%;
-			background: rgba(0,0,0,0.9);
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
 			color: white;
 			font-size: 24px;
 			display: none;
@@ -145,12 +166,14 @@
 			align-items: center;
 			text-align: center;
 		}
+
 		.option {
 			margin: 0 20px;
 			font-size: 20px;
 			cursor: pointer;
 			user-select: none;
 		}
+
 		#quizTimer {
 			margin-top: 10px;
 			font-size: 20px;
@@ -160,9 +183,11 @@
 		/* ===== Pantallas de fin ===== */
 		.endScreen {
 			position: absolute;
-			top:0; left:0;
-			width:100%; height:100%;
-			background: rgba(0,0,0,0.8);
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.8);
 			color: white;
 			display: none;
 			flex-direction: column;
@@ -172,6 +197,7 @@
 			z-index: 40;
 			text-align: center;
 		}
+
 		.endScreen button {
 			margin-top: 20px;
 			padding: 10px 20px;
@@ -182,9 +208,11 @@
 			border: none;
 			border-radius: 5px;
 		}
+
 		.endScreen button:hover {
 			background: #666;
 		}
+
 		.endScreen .stats {
 			margin-top: 10px;
 			font-size: 20px;
@@ -192,23 +220,49 @@
 		}
 
 		/* corazones amarillos */
-		.heart-yellow { color: gold; }
-		.heart-yellow.empty { opacity: 0.3; }
+		.heart-yellow {
+			color: gold;
+		}
+
+		.heart-yellow.empty {
+			opacity: 0.3;
+		}
 
 
 		/* Animación CSS para el overlay de victoria */
 		@keyframes fadeInScale {
-			0%   { opacity: 0; transform: scale(0.8); }
-			100% { opacity: 1; transform: scale(1); }
+			0% {
+				opacity: 0;
+				transform: scale(0.8);
+			}
+
+			100% {
+				opacity: 1;
+				transform: scale(1);
+			}
 		}
+
 		.endScreen.win {
 			animation: fadeInScale 0.8s ease-out forwards;
 		}
 
 		/*Menú*/
-		.absolute.inset-0 { position: absolute; top:0; right:0; bottom:0; left:0; }
-		.hidden { display: none; }
-		.z-50 { z-index: 50; }
+		.absolute.inset-0 {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.z-50 {
+			z-index: 50;
+		}
+
 		/* Efecto 3D en los botones*/
 		.menu-button {
 			/*background: linear-gradient(to bottom, #4f4f4f, #2c2c2c);*/
@@ -221,16 +275,21 @@
 			cursor: pointer;
 			transition: transform 0.1s ease;
 		}
+
 		.menu-button:active {
 			transform: translateY(2px);
 			box-shadow: 0 2px 0 #222;
 		}
+
 		.menu-button:disabled {
 			opacity: 0.5;
 			cursor: not-allowed;
-			pointer-events: none;/* eliminar el efecto hover */
-			background-color: #444;    /* fondo gris oscuro */
-  			filter: grayscale(100%);   /* escala de grises total */
+			pointer-events: none;
+			/* eliminar el efecto hover */
+			background-color: #444;
+			/* fondo gris oscuro */
+			filter: grayscale(100%);
+			/* escala de grises total */
 		}
 
 		.controls-list {
@@ -246,7 +305,8 @@
 		}
 
 		.controls-key {
-			min-width: 160px; /* ancho fijo para alinear todas las descripciones */
+			min-width: 160px;
+			/* ancho fijo para alinear todas las descripciones */
 			display: flex;
 			gap: 6px;
 			align-items: center;
@@ -280,20 +340,23 @@
 			color: #aaa;
 		}
 
-		#achievementsOverlay .grid > div:nth-child(-n+6) {
+		#achievementsOverlay .grid>div:nth-child(-n+6) {
 			border-bottom: 1px solid #666;
 			padding-bottom: 4px;
 		}
 
-		#ver-logros, #ver-logros-victoria {
+		#ver-logros,
+		#ver-logros-victoria {
 			transition: background-color 0.2s ease;
 		}
 
 		.scrollable-content {
 			max-height: 90vh;
 			overflow-y: auto;
-			padding-right: 1rem; /* espacio para la barra */
+			padding-right: 1rem;
+			/* espacio para la barra */
 		}
+
 		.scrollable-content::-webkit-scrollbar {
 			width: 8px;
 		}
@@ -302,36 +365,41 @@
 			background-color: #888;
 			border-radius: 4px;
 		}
+
 		.scrollable-content::-webkit-scrollbar-thumb:hover {
 			background-color: #555;
 		}
-
-
-  	</style>
+	</style>
 </head>
 
 <body>
-  	<div id="gameContainer">
+	<div id="gameContainer">
 		<!-- >>>>>> MENÚ PRINCIPAL <<<<<< -->
 		<div id="mainMenu" class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
 			<div class="bg-gray-800 p-8 rounded-lg text-white space-y-4 text-center w-64">
 				<h1 class="text-3xl font-bold">NÁVEX</h1>
 				<button id="btnPlay" class="menu-button bg-blue-600 hover:bg-blue-500 w-full">Jugar</button>
-				<button id="btnPlayInfinite" class="menu-button bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed w-full">Jugar ∞</button>
+				<button id="btnPlayInfinite"
+					class="menu-button bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed w-full">Jugar
+					∞</button>
 				<button id="btnControls" class="menu-button bg-green-600 hover:bg-green-500 w-full">Controles</button>
-				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido OFF</button>
-				<button id="btnAchievements" class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
+				<button id="btnSoundMenu" class="menu-button bg-yellow-600 hover:bg-yellow-500 w-full">Sonido
+					OFF</button>
+				<button id="btnAchievements"
+					class="menu-button bg-purple-600 hover:bg-purple-500 w-full">Logros</button>
 				<div class="mt-4 text-gray-400 text-xs">
 					<p>De Álex y David (López)</p>
-					<p>Versión 0.29 (alfa)</p>
+					<p>Versión 1.0 (beta)</p>
 				</div>
-			
+
 			</div>
 		</div>
 
 		<!-- >>>>>> OVERLAY CONTROLES <<<<<< -->
-		<div id="controlsOverlay" class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-[32rem] max-h-[90vh] overflow-y-auto scrollable-content">
+		<div id="controlsOverlay"
+			class="absolute inset-0 bg-black bg-opacity-90 hidden z-50 flex items-center justify-center">
+			<div
+				class="bg-gray-800 p-6 rounded-lg text-white w-[32rem] max-h-[90vh] overflow-y-auto scrollable-content">
 				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
 				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
 				scrollable-content → nombre del estilo CSS usado-->
@@ -367,28 +435,34 @@
 
 					<div class="controls-row">
 						<span class="controls-key">
-							<kbd class="key-badge">←</kbd> / <kbd class="key-badge">↑</kbd> / <kbd class="key-badge">→</kbd>
+							<kbd class="key-badge">←</kbd> / <kbd class="key-badge">↑</kbd> / <kbd
+								class="key-badge">→</kbd>
 						</span>
 						<span class="controls-desc">Elegir respuesta a las preguntas</span>
-					</div>				
+					</div>
 					<hr class="my-4 border-gray-600">
 					<p class="text-xl text-gray-300 mb-2 text-center">
-					<span class="text-yellow-400">OBJETIVO:</span> Destruye enemigos y recolecta objetos para alcanzar la puntuación del nivel.
+						<span class="text-yellow-400">OBJETIVO:</span> Destruye enemigos y recolecta objetos para
+						alcanzar la puntuación del nivel.
 					</p>
 					<!--<hr class="my-4 border-gray-600">-->
 					<p class="text-xl text-gray-300 mb-2 text-center">
-					Supera todos los niveles del juego para desbloquear el Modo Infinito (<span class="text-yellow-400">Jugar ∞</span>)
+						Supera todos los niveles del juego para desbloquear el Modo Infinito (<span
+							class="text-yellow-400">Jugar ∞</span>)
 					</p>
 
 				</div>
-				<button onclick="hideControls()" class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
+				<button onclick="hideControls()"
+					class="mt-6 w-full py-2 bg-blue-600 rounded hover:bg-blue-500">Volver</button>
 			</div>
 		</div>
 
 		<!-- >>>>>> OVERLAY LOGROS <<<<<< -->
-		<div id="achievementsOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  			<!-- <div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">-->
-			<div class="bg-gray-800 p-6 rounded-lg text-white w-[42rem] max-h-[90vh] overflow-y-auto scrollable-content">
+		<div id="achievementsOverlay"
+			class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+			<!-- <div class="bg-gray-800 text-white rounded-lg p-6 w-[40rem] max-h-[90vh] overflow-y-auto">-->
+			<div
+				class="bg-gray-800 p-6 rounded-lg text-white w-[42rem] max-h-[90vh] overflow-y-auto scrollable-content">
 				<!-- max-h-[90vh] → hace que el recuadro nunca supere el 90% de la altura de la ventana.
 				overflow-y-auto → activa la barra de desplazamiento solo si es necesario.
 				scrollable-content → nombre del estilo CSS usado-->
@@ -431,7 +505,8 @@
 
 				<h2 class="text-xl mb-4 text-center" style="color: gold;">RÉCORDS MODO INFINITO</h2>
 				<div class="grid grid-cols-[140px_repeat(5,minmax(0,1fr))] gap-4 text-center">
-					<div></div> <div class="font-semibold">Tiempo</div>
+					<div></div>
+					<div class="font-semibold">Tiempo</div>
 					<div class="font-semibold">Preguntas</div>
 					<div class="font-semibold">Aciertos</div>
 					<div class="font-semibold">Fallos</div>
@@ -474,16 +549,16 @@
 						<span>Responde correctamente 10 preguntas.</span>
 					</div>
 					<div class="flex items-center">
-						<img id="medalla-aciertos_25" src="" alt="medalla-aciertos25" class="w-12 h-12 mr-4">
-						<span>Responde correctamente 25 preguntas SIN fallar ninguna</span>
-					</div>
-					<div class="flex items-center">
 						<img id="medalla-aciertos_50" src="" alt="medalla-aciertos_50" class="w-12 h-12 mr-4">
 						<span>Responde correctamente 50 preguntas.</span>
 					</div>
 					<div class="flex items-center">
+						<img id="medalla-aciertos_25" src="" alt="medalla-aciertos25" class="w-12 h-12 mr-4">
+						<span>No falles ninguna pregunta y acierta, al menos, 25.</span>
+					</div>
+					<div class="flex items-center">
 						<img id="medalla-veloz" src="" alt="medalla-veloz" class="w-12 h-12 mr-4">
-						<span>Completa el juego en menos de 10 minutos</span>
+						<span>Completa el juego en menos de 10 minutos.</span>
 					</div>
 				</div>
 
@@ -507,7 +582,7 @@
 			<div class="row2">
 				<div id="quizStats">Aciertos: 0 | Fallos: 0</div>
 				<div class="hud-right">
-					<span id="debugIcon" class="select-none text-white text-2xl ml-4">🔧</span>					
+					<span id="debugIcon" class="select-none text-white text-2xl ml-4">🔧</span>
 					<span id="time">🕒 00:00</span>
 					<span id="muteIcon" class="select-none text-white text-2xl ml-4">🔊</span>
 				</div>
@@ -519,7 +594,8 @@
 
 		<!-- Overlay instrucciones -->
 		<div id="levelOverlay">
-			<h1 id="levelMessage" style="font-size: 48px; font-weight: bold; text-shadow: 2px 2px 8px #ff0;">Nivel 1</h1>
+			<h1 id="levelMessage" style="font-size: 48px; font-weight: bold; text-shadow: 2px 2px 8px #ff0;">Nivel 1
+			</h1>
 			<div id="levelVisuals"></div>
 		</div>
 
@@ -539,8 +615,9 @@
 			<div>¡Te han eliminado!</div>
 			<div id="endStats" class="stats"></div>
 			<button id="restartBtn">Volver a empezar</button>
-			<button id="ver-logros" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
-  			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
+			<button id="ver-logros" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver
+				logros</button>
+			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
 		<!-- Victoria -->
@@ -548,13 +625,14 @@
 			<div>🎉 ¡Has ganado!</div>
 			<div id="endStatsWin" class="stats"></div>
 			<button id="restartWinBtn">Volver a empezar</button>
-			<button id="ver-logros-victoria" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver logros</button>
+			<button id="ver-logros-victoria" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ver
+				logros</button>
 			<button id="btnMenu" class="mt-4 w-48 py-2 bg-blue-600 rounded hover:bg-blue-500">Ir a Menú</button>
 		</div>
 
 		<!-- Crea un canvas encima de todo para el confeti y los fuegos artificiales -->
-		<canvas id="celebrationCanvas" 
-        style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; display:none;"></canvas>
+		<canvas id="celebrationCanvas"
+			style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; display:none;"></canvas>
 
 
 		<!-- Declara y precarga el audio -->
@@ -565,46 +643,46 @@
 		<audio id="victoryMusic" src="Sonidos/victory.mp3" preload="auto"></audio>
 		<audio id="bgMusic" src="Sonidos/AmazingFuture.mp3" preload="auto" loop></audio>
 
-  	</div>
+	</div>
 
-  	<script>
+	<script>
 		// DEBUG ------
 		let inmortal = false;
 		let qPressCount = 0;
-        let lastQPressTime = 0;
+		let lastQPressTime = 0;
 		let debugMode = false
 		//-------------
 
 		// Variables para el modo infinito
 		let isInfiniteMode = false;
-		let nextShipSpawnTime = null;    
+		let nextShipSpawnTime = null;
 		let nextSatelliteSpawnTime = null;
 		let lastGameWasInfinite = false;
 		let campaignDone = false;
 
 		// ===== Carga de imágenes =====
-		const playerImage     = new Image();
-		playerImage.src       = "Imágenes/nave.png";
-		const rockImage       = new Image();
-		rockImage.src         = "Imágenes/roca.png";
+		const playerImage = new Image();
+		playerImage.src = "Imágenes/nave.png";
+		const rockImage = new Image();
+		rockImage.src = "Imágenes/roca.png";
 		const strongRockImage = new Image();
-		strongRockImage.src   = "Imágenes/rocaFuerte.png";
-		const bonusImage      = new Image();
-		bonusImage.src        = "Imágenes/bonus.png";
-		const powerUpImage    = new Image();
-		powerUpImage.src      = "Imágenes/powerup.png";
-		const enemyImage       = new Image();
-		enemyImage.src         = "Imágenes/naveEnemiga_1.png";
+		strongRockImage.src = "Imágenes/rocaFuerte.png";
+		const bonusImage = new Image();
+		bonusImage.src = "Imágenes/bonus.png";
+		const powerUpImage = new Image();
+		powerUpImage.src = "Imágenes/powerup.png";
+		const enemyImage = new Image();
+		enemyImage.src = "Imágenes/naveEnemiga_1.png";
 		const shieldBonusImage = new Image();
-		shieldBonusImage.src   = "Imágenes/Escudo.png";
+		shieldBonusImage.src = "Imágenes/Escudo.png";
 		const laserImage = new Image();
-		laserImage.src   = "Imágenes/naveLaser.png";
+		laserImage.src = "Imágenes/naveLaser.png";
 		const fractalShipImage = new Image();
 		fractalShipImage.src = "Imágenes/naveFractal.png";
 		const fractalProjectileImage = new Image();
 		fractalProjectileImage.src = "Imágenes/proyectilFractal.png";
 		const cometImage = new Image();
-		cometImage.src   = "Imágenes/cometa.png";
+		cometImage.src = "Imágenes/cometa.png";
 		const satelliteImage = new Image();
 		satelliteImage.src = "Imágenes/Satélite1.png";
 		const blindSatImage = new Image();
@@ -612,7 +690,7 @@
 		const absorberSatImage = new Image();
 		absorberSatImage.src = "Imágenes/Satélite3b.png";
 		const mirrorImage = new Image();
-		mirrorImage.src   = "Imágenes/naveEspejo.png";
+		mirrorImage.src = "Imágenes/naveEspejo.png";
 		const imagePaths = {
 			medallas: {
 				aciertos_10: "Imágenes/medalla02.png",
@@ -694,7 +772,7 @@
 		}
 
 		// Icono para indicar si se pueden usar los trucos para debug (o cheat)
-		const debugIcon = document.getElementById("debugIcon");	
+		const debugIcon = document.getElementById("debugIcon");
 		debugIcon.classList.add("hidden");	// Inicialmente oculto
 
 		// Audio
@@ -709,19 +787,19 @@
 
 		// ===== Canvas =====
 		const container = document.getElementById("gameContainer");
-		const canvas    = document.getElementById("gameCanvas");
-		const ctx       = canvas.getContext("2d");
-		canvas.width    = container.clientWidth;
-		canvas.height   = container.clientHeight;
+		const canvas = document.getElementById("gameCanvas");
+		const ctx = canvas.getContext("2d");
+		canvas.width = container.clientWidth;
+		canvas.height = container.clientHeight;
 
 		// ===== Variables =====
-		let lives        = 3;
-		const maxLives   = 3;
-		let score        = 0;
-		let startTime    = Date.now();
+		let lives = 3;
+		const maxLives = 3;
+		let score = 0;
+		let startTime = Date.now();
 		let quizCorrects = 0;
-		let quizFails    = 0;
-		const rockSpeed  = 3;
+		let quizFails = 0;
+		const rockSpeed = 3;
 		const bulletSpeed = 7;
 		let extraLives = 0;   // 0–3, solo se llena en Nivel 11
 		let gameWon = false		// Bandera para indicar si se ha acabado el último nivel
@@ -732,9 +810,9 @@
 				goal: 500,
 				message: "Nivel 1",
 				visuals: [
-					{ img: rockImage,   text: "¡Destrúyelo!" },
-					{ img: bonusImage,  text: "Mejora el disparo" },
-					{ img: powerUpImage,text: "Recupérate" }
+					{ img: rockImage, text: "¡Destrúyelo!" },
+					{ img: bonusImage, text: "Mejora el disparo" },
+					{ img: powerUpImage, text: "Recupérate" }
 				],
 				rockRate: 0.03,	//Porcentaje de frames en los que se crea una roca
 				strongProb: 0,	//(entre 0 y 1) proporción de rocas que serán fuertes.
@@ -748,7 +826,7 @@
 				message: "Nivel 2",
 				visuals: [
 					{ img: strongRockImage, text: "¡Es más dura!" },
-					{ img: bonusImage,      text: "¡Doble disparo!" }
+					{ img: bonusImage, text: "¡Doble disparo!" }
 				],
 				rockRate: 0.03,
 				strongProb: 0.5,
@@ -774,7 +852,7 @@
 				goal: 2000,
 				message: "Nivel 4",
 				visuals: [
-					{ img: enemyImage,    text: "¡Enemigos!" },
+					{ img: enemyImage, text: "¡Enemigos!" },
 					{ img: shieldBonusImage, text: "Escudo" }
 				],
 				rockRate: 0.03,
@@ -828,7 +906,7 @@
 				message: "Nivel 8",
 				visuals: [
 					{ img: satelliteImage, text: "¡Te paraliza temporalmente!" },
-				    { img: bonusImage, text: "¡Disparo cuádruple!" }
+					{ img: bonusImage, text: "¡Disparo cuádruple!" }
 				],
 				rockRate: 0.03,         // tasa de aparición de rocas
 				strongProb: 0.5,
@@ -843,8 +921,8 @@
 				visuals: [
 					{ img: blindSatImage, text: "¡Te cegará!" }
 				],
-				rockRate:     0.03,
-				strongProb:   0.5,
+				rockRate: 0.03,
+				strongProb: 0.5,
 				cometRate: 0.001,
 				satelliteRate: 0,    // Satélites paralizadores
 				blindSatRate: 0.005,    // probabilidad por frame de generar un satélite cegador
@@ -882,32 +960,32 @@
 				visuals: [
 					{ img: playerImage, text: '¡De todo!' }
 				],
-				rockRate:       0.03,
-				strongProb:     0.5,
-				cometRate:      0.005,
-				satelliteRate:  0.001,
-				blindSatRate:   0.001,
-				absorberSatRate:0.001
+				rockRate: 0.03,
+				strongProb: 0.5,
+				cometRate: 0.005,
+				satelliteRate: 0.001,
+				blindSatRate: 0.001,
+				absorberSatRate: 0.001
 			}
 
 
 		];
 
-		let scoreGoal    = levels[0].goal;
-		let gameRunning  = true;
-		let paused       = false;
-		let levelActive  = false;
-		let quizActive   = false;
+		let scoreGoal = levels[0].goal;
+		let gameRunning = true;
+		let paused = false;
+		let levelActive = false;
+		let quizActive = false;
 
 		// Disparo
-		let lastShotTime   = 0;
+		let lastShotTime = 0;
 		let shotGrade = 0;
 		const SHOT_GRADES = [
 			{ type: "simple", cooldown: 200 },
 			{ type: "simple", cooldown: 150 },
 			{ type: "simple", cooldown: 100 },
-			{ type: "double", cooldown: 100 }, 
-			{ type: "quadruple", cooldown: 100 }  
+			{ type: "double", cooldown: 100 },
+			{ type: "quadruple", cooldown: 100 }
 		];
 
 		//Grado máximo permitido del disparo (según el nivel)
@@ -918,12 +996,12 @@
 		}
 
 		// Quiz
-		let quizStart      = 0;
-		let quizIdx        = -1;
-		let quizQuestion   = "";
-		let quizOptions    = [];
-		let quizOrigin     = null;  // "disparo" o "vida"
-		let quizAnswered   = false;
+		let quizStart = 0;
+		let quizIdx = -1;
+		let quizQuestion = "";
+		let quizOptions = [];
+		let quizOrigin = null;  // "disparo" o "vida"
+		let quizAnswered = false;
 
 		// Jugador
 		let player = {
@@ -941,30 +1019,30 @@
 		};
 
 		// Entidades
-		const stars     = Array.from({length:150},()=>({
-			x:Math.random()*canvas.width,
-			y:Math.random()*canvas.height,
-			size:Math.random()*2+1,
-			speed:Math.random()*0.5+0.2
+		const stars = Array.from({ length: 150 }, () => ({
+			x: Math.random() * canvas.width,
+			y: Math.random() * canvas.height,
+			size: Math.random() * 2 + 1,
+			speed: Math.random() * 0.5 + 0.2
 		}));
 		const bullets = [];
 		const rocks = [];
 		const bonuses = [];
 		const shieldBonuses = [];
-		const powerUps  = [];
+		const powerUps = [];
 		const explosions = [];
 		const popups = []; //Texto con los puntos obtenidos
 		let enemies = [];
 		let enemyBullets = [];
 		let laserShips = [];
-		let fractalShips = []; 
+		let fractalShips = [];
 		const fractalBullets = [];
 		const comets = [];
 		const satellites = [];
 		const waveSlices = [];
 		const blindSatellites = [];
 		const blindWaves = [];
-		const blindWaveSpeed     = 8;	// px por frame
+		const blindWaveSpeed = 8;	// px por frame
 		const absorberSatellites = [];
 		let mirrorShip = null;
 		let mirrorDefeated = false;    // evita respawns tras destruirla
@@ -996,15 +1074,15 @@
 		let celebrationLoopId;
 
 		// Referencias al menú y overlays
-		const mainMenu          = document.getElementById("mainMenu");
-		const controlsOverlay   = document.getElementById("controlsOverlay");
+		const mainMenu = document.getElementById("mainMenu");
+		const controlsOverlay = document.getElementById("controlsOverlay");
 		const achievementsOverlay = document.getElementById("achievementsOverlay");
-		const btnPlayMenu       = document.getElementById("btnPlay");
+		const btnPlayMenu = document.getElementById("btnPlay");
 		const btnPlayInfinite = document.getElementById("btnPlayInfinite");
-		const btnControlsMenu   = document.getElementById("btnControls");
-		const btnSoundMenu      = document.getElementById("btnSoundMenu");
-		const btnAchievements   = document.getElementById("btnAchievements");
-		const btnBackToMenu     = document.querySelectorAll("#btnMenu"); // gameOver + win
+		const btnControlsMenu = document.getElementById("btnControls");
+		const btnSoundMenu = document.getElementById("btnSoundMenu");
+		const btnAchievements = document.getElementById("btnAchievements");
+		const btnBackToMenu = document.querySelectorAll("#btnMenu"); // gameOver + win
 
 		let lastRun = {
 			level: 0,
@@ -1048,13 +1126,13 @@
 		}
 		function showControls() { controlsOverlay.classList.remove("hidden"); }
 		function hideControls() { controlsOverlay.classList.add("hidden"); }
-		function showAchievements() { 
-			captureLastRun();   
-  			checkRecords();
+		function showAchievements() {
+			captureLastRun();
+			checkRecords();
 			updateAchievementsOverlay();
 			updateAchievementsOverlayInfinite();
 			actualizarMedallas();
-			achievementsOverlay.classList.remove("hidden"); 
+			achievementsOverlay.classList.remove("hidden");
 		}
 		function hideAchievements() { achievementsOverlay.classList.add("hidden"); }
 
@@ -1080,9 +1158,9 @@
 				// reset de variables
 				resetBasicVariables();
 				isInfiniteMode = false;
-				extraLives   = 0; // si usas vidas extra en nivel 11
+				extraLives = 0; // si usas vidas extra en nivel 11
 				currentLevel = 0;
-				scoreGoal    = levels[0].goal;
+				scoreGoal = levels[0].goal;
 
 				resetPlayer();
 				resetEntities();
@@ -1090,7 +1168,7 @@
 
 				// Ocultar pantallas de fin
 				document.getElementById("gameOverScreen").style.display = "none";
-				document.getElementById("winScreen").style.display      = "none";
+				document.getElementById("winScreen").style.display = "none";
 
 				updateLivesDisplay();
 				updateHUD();
@@ -1120,9 +1198,9 @@
 			// Apunta al nivel infinito (es el último del array)
 			currentLevel = levels.length - 1;
 			// Nunca se cumple score ≥ Infinity
-			scoreGoal    = Infinity;
+			scoreGoal = Infinity;
 
-			startTime      = Date.now();         // iniciamos cronómetro
+			startTime = Date.now();         // iniciamos cronómetro
 			hideMainMenu();                      // cerramos menú
 			startBackgroundMusic();
 			requestAnimationFrame(gameLoop);
@@ -1130,12 +1208,12 @@
 
 
 		// ===== HUD =====
-		function updateLivesDisplay(){
+		function updateLivesDisplay() {
 			const div = document.getElementById("lives");
 			div.innerHTML = "";
 
 			// 3 corazones rojos (maxLives = 3)
-			for (let i = 0; i < maxLives; i++){
+			for (let i = 0; i < maxLives; i++) {
 				const s = document.createElement("span");
 				s.className = "heart" + (i >= lives ? " empty" : "");
 				s.textContent = "❤️";
@@ -1143,8 +1221,8 @@
 			}
 
 			// En Nivel 11 (índice 10) añadimos hasta 3 corazones amarillos
-			if (currentLevel === 10){
-				for (let j = 0; j < 3; j++){
+			if (currentLevel === 10) {
+				for (let j = 0; j < 3; j++) {
 					const s = document.createElement("span");
 					// usa otra clase para vacío/lleno, por ejemplo "heart-yellow"
 					s.className = "heart heart-yellow" + (j >= extraLives ? " empty" : "");
@@ -1154,30 +1232,30 @@
 			}
 		}
 
-		function updateHUD(){
+		function updateHUD() {
 			if (isInfiniteMode) {
 				document.getElementById("score").textContent = `${score}`;
 			} else {
 				document.getElementById("score").textContent = `${score} / ${scoreGoal}`;
 			}
 
-			const elapsed = Math.floor((Date.now()-startTime)/1000);
-			const mm = String(Math.floor(elapsed/60)).padStart(2,"0");
-			const ss = String(elapsed%60).padStart(2,"0");
-			document.getElementById("time").textContent =`🕒 ${mm}:${ss}`;
+			const elapsed = Math.floor((Date.now() - startTime) / 1000);
+			const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
+			const ss = String(elapsed % 60).padStart(2, "0");
+			document.getElementById("time").textContent = `🕒 ${mm}:${ss}`;
 			//document.getElementById("levelIndicator").textContent =	`Nivel ${currentLevel + 1}`;
 
-			const levelLabel = isInfiniteMode ? "∞" : `Nivel ${currentLevel+1}`;
+			const levelLabel = isInfiniteMode ? "∞" : `Nivel ${currentLevel + 1}`;
 			document.getElementById("levelIndicator").textContent = levelLabel;
 
-			document.getElementById("quizStats").textContent =`Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
+			document.getElementById("quizStats").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 
 		}
 
 		// ===== Overlay nivel =====
-		function showLevelOverlay(){
+		function showLevelOverlay() {
 			levelActive = true;
-			const ov    = document.getElementById("levelOverlay");
+			const ov = document.getElementById("levelOverlay");
 			document.getElementById("levelMessage").textContent =
 				levels[currentLevel].message;
 
@@ -1189,14 +1267,14 @@
 				row.className = "item";
 				const img = document.createElement("img");
 				img.src = v.img.src;
-				const lbl= document.createElement("span");
+				const lbl = document.createElement("span");
 				lbl.textContent = v.text;
-				row.append(img,lbl);
+				row.append(img, lbl);
 				vis.appendChild(row);
 			});
 
 			ov.style.display = "flex";
-			setTimeout(()=>{
+			setTimeout(() => {
 				ov.style.display = "none";
 				levelActive = false;
 			}, 3000);
@@ -1228,8 +1306,8 @@
 			}
 
 			if (currentLevel === 9) {	//Nivel 10 (índice 9)
-				spawnFractalShip("left");  
-				spawnEnemy("right");  
+				spawnFractalShip("left");
+				spawnEnemy("right");
 
 			}
 		}
@@ -1246,13 +1324,13 @@
 			});
 		}
 
-		function spawnRock(){
+		function spawnRock() {
 			const strong = Math.random() < levels[currentLevel].strongProb;
 			rocks.push({
-				x: Math.random()*(canvas.width-40),
+				x: Math.random() * (canvas.width - 40),
 				y: -40,
 				size: 40,
-				hp: strong?3:1,
+				hp: strong ? 3 : 1,
 				strong
 			});
 		}
@@ -1264,11 +1342,11 @@
 
 			if (edge < 0.33) {
 				// Desde arriba
-				x  = Math.random() * canvas.width;
-				y  = -size;
+				x = Math.random() * canvas.width;
+				y = -size;
 				// dy = 2 + Math.random() * 2;
 				// dx = (Math.random() - 0.5) * 2;
-				if (Math.random() < 0.5){
+				if (Math.random() < 0.5) {
 					dx = 1;
 				} else {
 					dx = -1;
@@ -1277,8 +1355,8 @@
 			}
 			else if (edge < 0.66) {
 				// Desde izquierda (25% superior)
-				x  = -size;
-				y  = Math.random() * canvas.height * 0.25;
+				x = -size;
+				y = Math.random() * canvas.height * 0.25;
 				// dx = 2 + Math.random() * 2;
 				// dy = 2 + Math.random() * 2;
 				dx = 3;
@@ -1286,40 +1364,40 @@
 			}
 			else {
 				// Desde derecha (25% superior)
-				x  = canvas.width + size;
-				y  = Math.random() * canvas.height * 0.25;
+				x = canvas.width + size;
+				y = Math.random() * canvas.height * 0.25;
 				// dx = - (2 + Math.random() * 2);
 				// dy = 2 + Math.random() * 2;
 				dx = -3;
 				dy = 3;
 			}
 
-			comets.push({ 
-				x, 
-				y, 
-				size, 
-				hp: 1, 
-				dx, 
-				dy 
+			comets.push({
+				x,
+				y,
+				size,
+				hp: 1,
+				dx,
+				dy
 			});
 		}
 
-		function spawnBonus(){
-			if(Math.random() < 0.004){
-				bonuses.push({ x:Math.random()*(canvas.width-34), y:-30, size:34 });
+		function spawnBonus() {
+			if (Math.random() < 0.004) {
+				bonuses.push({ x: Math.random() * (canvas.width - 34), y: -30, size: 34 });
 			}
 		}
 
-		function spawnPowerUp(){
-			let powerUPrate 
+		function spawnPowerUp() {
+			let powerUPrate
 			if (currentLevel === 10) {	//Nivel 11 (índice 10)
 				powerUPrate = 0.006;
 			} else {
 				powerUPrate = 0.002;
 			}
 
-			if(Math.random() < powerUPrate){
-				powerUps.push({ x:Math.random()*(canvas.width-24), y:-30, size:24 });
+			if (Math.random() < powerUPrate) {
+				powerUps.push({ x: Math.random() * (canvas.width - 24), y: -30, size: 24 });
 			}
 		}
 
@@ -1351,7 +1429,7 @@
 			enemies.push({
 				x,
 				y: 50,		// altura fija
-				width: 48, 
+				width: 48,
 				height: 48,
 				hp: 20,// Puntos de vida en cada momento (aquí, al crearlo,debe ser igual a hpIni)
 				hpIni: 20,// Puntos de vida iniciales (para calcular barra de vida)
@@ -1374,52 +1452,52 @@
 
 		function spawnLaserShip(fromSide = null) {
 			let x, dx;
-			if (fromSide === "left")  { x = -64; dx = 2; }
+			if (fromSide === "left") { x = -64; dx = 2; }
 			if (fromSide === "right") { x = canvas.width; dx = -2; }
 			if (!fromSide) {
-				x = Math.random()*(canvas.width-64);
-				dx = Math.random()<0.5?2:-2;
+				x = Math.random() * (canvas.width - 64);
+				dx = Math.random() < 0.5 ? 2 : -2;
 			}
 			laserShips.push({
 				x, y: 50,
-				w: 48, 
+				w: 48,
 				h: 48,
-				dx, 
+				dx,
 				hp: 100,// Puntos de vida en cada momento (aquí, al crearlo,debe ser igual a hpIni)
 				hpIni: 100,// Puntos de vida iniciales
 				oscill: 0,
-				entering: !!fromSide, 
-				targetX: fromSide? Math.random()*(canvas.width-100)+50 : null,
-				spawnTime: Date.now(), 
+				entering: !!fromSide,
+				targetX: fromSide ? Math.random() * (canvas.width - 100) + 50 : null,
+				spawnTime: Date.now(),
 				waiting: true,
-				lastShot: 0, 
+				lastShot: 0,
 				cooldown: 2000, // 2s
-				laserOn: false, 
+				laserOn: false,
 				laserStart: 0
 			});
 		}
 
 		function spawnFractalShip(fromSide = null) {
 			let x, dx;
-			if (fromSide === "left")  { x = -64; dx = 2; }
+			if (fromSide === "left") { x = -64; dx = 2; }
 			if (fromSide === "right") { x = canvas.width; dx = -2; }
 			if (!fromSide) {
-				x = Math.random()*(canvas.width-64);
-				dx = Math.random()<0.5?2:-2;
+				x = Math.random() * (canvas.width - 64);
+				dx = Math.random() < 0.5 ? 2 : -2;
 			}
 
 			fractalShips.push({
-				x, 
+				x,
 				y: 50,
-				w: 48, 
+				w: 48,
 				h: 48,
-				dx, 
+				dx,
 				hp: 200,// Puntos de vida en cada momento (aquí, al crearlo,debe ser igual a hpIni)
 				hpIni: 200,// Puntos de vida iniciales
 				oscill: 0,
-				entering: !!fromSide, 
-				targetX: fromSide? Math.random()*(canvas.width-100)+50 : null,
-				spawnTime: Date.now(), 
+				entering: !!fromSide,
+				targetX: fromSide ? Math.random() * (canvas.width - 100) + 50 : null,
+				spawnTime: Date.now(),
 				waiting: true,
 				lastShot: Date.now(),
 				cooldown: 1000 + 2000 * Math.random()
@@ -1434,11 +1512,11 @@
 				const y = 100;	// altura
 				const dx = side === "left" ? 1 : -1;  // velocidad de desplazamiento
 
-				satellites.push({ 
-					x, 
-					y, 
-					size, 
-					dx, 
+				satellites.push({
+					x,
+					y,
+					size,
+					dx,
 					hp: 1,
 					probShot: 0.02	// % de frames en los que disparará
 				});
@@ -1455,8 +1533,8 @@
 				expandSpeed: 4,      // pixels que crece el radio y avanza por frame
 				delay,               // frames a esperar antes de empezar a dibujar. Permite escalonar las 3 ondas de la ráfaga.
 				age: 0,              // contador interno de frames
-				startAngle: Math.PI/2 - Math.PI/12,  // 75º
-				endAngle:   Math.PI/2 + Math.PI/12   // 105º → arco de 30º (apuntando hacia abajo)
+				startAngle: Math.PI / 2 - Math.PI / 12,  // 75º
+				endAngle: Math.PI / 2 + Math.PI / 12   // 105º → arco de 30º (apuntando hacia abajo)
 			});
 		}
 
@@ -1465,27 +1543,27 @@
 			if (Math.random() < levels[currentLevel].blindSatRate) {
 				const size = 30;
 				const side = Math.random() < 0.5 ? "left" : "right";
-				const x    = side === "left" ? -size : canvas.width + size;
-				const y    = 100;
-				const dx   = side === "left" ? 1 : -1;
+				const x = side === "left" ? -size : canvas.width + size;
+				const y = 100;
+				const dx = side === "left" ? 1 : -1;
 
 				let tmin = 4000;
 				let tmax = 6000;
 				blindSatellites.push({
-					x, 
-					y, 
-					size, 
-					dx, 
+					x,
+					y,
+					size,
+					dx,
 					hp: 1,
 					nextWaveTime: Date.now() + tmin + Math.random() * (tmax - tmin)
-    			});
+				});
 			}
 		}
 
 		function spawnAbsorberSatellite() {
 			// Si ya hay uno en pantalla, no generar otro
-  			if (absorberSatellites.length > 0) return;
-			
+			if (absorberSatellites.length > 0) return;
+
 			if (Math.random() < levels[currentLevel].absorberSatRate) {
 				const size = 30;
 				const side = Math.random() < 0.5 ? "left" : "right";
@@ -1493,11 +1571,11 @@
 				const y = 140;
 				const dx = side === "left" ? 1 : -1;
 
-				absorberSatellites.push({ 
-					x, 
-					y, 
-					size, 
-					dx 
+				absorberSatellites.push({
+					x,
+					y,
+					size,
+					dx
 				});
 			}
 		}
@@ -1506,15 +1584,15 @@
 			if (mirrorShip || mirrorDefeated) return; // Si ya existe una o ya ha sido destruida
 
 			mirrorShip = {
-				x: canvas.width/2 - player.w/2,
+				x: canvas.width / 2 - player.w / 2,
 				y: 50,
 				w: player.w,
 				h: player.h,
 				shieldLevel: player.shieldLevel, // copia el escudo actual del jugador
 				hp: 100,     // puntos de vida actuales
-    			hpIni: 100,   // para dibujar la barra
+				hpIni: 100,   // para dibujar la barra
 				vx: 3,              // velocidad horizontal
-    			evadeThreshold: 50  // distancia en px a la bala para reaccionar
+				evadeThreshold: 50  // distancia en px a la bala para reaccionar
 			};
 		}
 
@@ -1522,30 +1600,30 @@
 
 		// ===== Dibujar =====
 		// Dibuja y actualiza las explosiones
-		function drawExplosions(){
-			explosions.forEach((e,i) => {
+		function drawExplosions() {
+			explosions.forEach((e, i) => {
 				ctx.beginPath();
-				ctx.arc(e.x, e.y, e.radius, 0, 2*Math.PI);
+				ctx.arc(e.x, e.y, e.radius, 0, 2 * Math.PI);
 				ctx.fillStyle = `rgba(255,165,0,${e.alpha})`;
 				ctx.fill();
 				e.radius += 2;
-				e.alpha  -= 0.04;
-				if(e.alpha <= 0 || e.radius > e.maxRadius) {
-					explosions.splice(i,1);
+				e.alpha -= 0.04;
+				if (e.alpha <= 0 || e.radius > e.maxRadius) {
+					explosions.splice(i, 1);
 				}
 			});
 		}
 
 		//Estrellas de fondo
-		function drawStars(){
-			ctx.fillStyle="white";
-			stars.forEach(s=>{
+		function drawStars() {
+			ctx.fillStyle = "white";
+			stars.forEach(s => {
 				ctx.beginPath();
-				ctx.arc(s.x,s.y,s.size,0,2*Math.PI);
+				ctx.arc(s.x, s.y, s.size, 0, 2 * Math.PI);
 				ctx.fill();
-				s.y+=s.speed;
-				if(s.y>canvas.height){
-					s.y=0; s.x=Math.random()*canvas.width;
+				s.y += s.speed;
+				if (s.y > canvas.height) {
+					s.y = 0; s.x = Math.random() * canvas.width;
 				}
 			});
 		}
@@ -1557,7 +1635,7 @@
 			const paralyzed = now < player.paralyzeEnd;
 
 			ctx.save();
-			
+
 			// Si está paralizado, cambia el aspecto de la nave
 			if (paralyzed) {
 				ctx.globalAlpha = 0.5;	//semitransparente
@@ -1579,14 +1657,14 @@
 
 			// Dibujar escudo si está activo
 			if (player.shieldLevel > 0) {
-				const colors = ["white","blue","red"];
+				const colors = ["white", "blue", "red"];
 				ctx.strokeStyle = colors[player.shieldLevel - 1];
 				ctx.lineWidth = 1 + player.shieldLevel;	//Grosor del escudo (según el grado del escudo)
 				ctx.beginPath();
 				ctx.arc(
-					player.x + player.w/2,
-					player.y + player.h/2,
-					player.w/2 + 10,
+					player.x + player.w / 2,
+					player.y + player.h / 2,
+					player.w / 2 + 10,
 					0, Math.PI * 2
 				);
 				ctx.stroke();
@@ -1595,7 +1673,7 @@
 			ctx.restore();
 		}
 
-		function drawBullets(){
+		function drawBullets() {
 			ctx.fillStyle = "yellow";
 			bullets.forEach((b, i) => {
 				// Paso por defecto (hacia arriba)
@@ -1605,12 +1683,12 @@
 				// Si hay un satélite absorvedor en pantalla...
 				if (absorberSatellites.length > 0) {
 					const sat = absorberSatellites[0];  // sólo sale un satélite a la vez
-					const cx  = sat.x + sat.size / 2;
-					const cy  = sat.y + sat.size / 2;
-					const bx  = b.x + 2;     // centro aproximado de la bala
-					const by  = b.y + 5;
-					const vx  = cx - bx;
-					const vy  = cy - by;
+					const cx = sat.x + sat.size / 2;
+					const cy = sat.y + sat.size / 2;
+					const bx = b.x + 2;     // centro aproximado de la bala
+					const by = b.y + 5;
+					const vx = cx - bx;
+					const vy = cy - by;
 					const dist = Math.hypot(vx, vy);
 
 					const attractRadius = 200;  // Radio de atracción de las balas del jugador
@@ -1631,15 +1709,15 @@
 			});
 		}
 
-		function drawRocks(){
-			rocks.forEach(r=>{
-				const img = r.strong? strongRockImage : rockImage;
+		function drawRocks() {
+			rocks.forEach(r => {
+				const img = r.strong ? strongRockImage : rockImage;
 				//Si es la roca más fuerte, se le reduce el tamaño con cda disparo.
 				const scale = r.strong ? (0.7 + 0.1 * r.hp) : 1; // hp=3 → 1.0, hp=2 → 0.9, hp=1 → 0.8
 				const size = r.size * scale;
 				const offset = (r.size - size) / 2;
 
-            	ctx.drawImage(img, r.x + offset, r.y + offset, size, size);
+				ctx.drawImage(img, r.x + offset, r.y + offset, size, size);
 
 				r.y += rockSpeed;
 			});
@@ -1655,18 +1733,18 @@
 		}
 
 		//Bonus de disparo
-		function drawBonuses(){
-			bonuses.forEach(b=>{
-				ctx.drawImage(bonusImage, b.x,b.y,b.size,b.size);
-				b.y+=2;
+		function drawBonuses() {
+			bonuses.forEach(b => {
+				ctx.drawImage(bonusImage, b.x, b.y, b.size, b.size);
+				b.y += 2;
 			});
 		}
 
 		//Bonus de Vidas
-		function drawPowerUps(){
-			powerUps.forEach(p=>{
-				ctx.drawImage(powerUpImage, p.x,p.y,p.size,p.size);
-				p.y+=2;
+		function drawPowerUps() {
+			powerUps.forEach(p => {
+				ctx.drawImage(powerUpImage, p.x, p.y, p.size, p.size);
+				p.y += 2;
 			});
 		}
 
@@ -1679,7 +1757,7 @@
 
 				drawHealthBar(e); // Dibuja la barra de vida (roja por defecto)
 			});
-		}		
+		}
 
 		function drawSatellites() {
 			satellites.forEach((s, i) => {
@@ -1703,13 +1781,13 @@
 				ctx.drawImage(shieldBonusImage, s.x, s.y, s.size, s.size);
 				s.y += 2;
 			});
-		}		
+		}
 
 		function drawLaserShips() {
 			laserShips.forEach(s => {
 				// temblor según s.oscill (por si le alcanza una bala)
-				const shake = Math.sin(s.oscill) * 5; 
-				const xPos  = s.x + shake;
+				const shake = Math.sin(s.oscill) * 5;
+				const xPos = s.x + shake;
 
 				ctx.drawImage(laserImage, xPos, s.y, s.w, s.h);
 
@@ -1722,13 +1800,13 @@
 				if (!s.laserOn) return;
 
 				// Calcular la posición X del rayo y su punto de salida (topY)
-				const cx   = s.x + s.w/2;
+				const cx = s.x + s.w / 2;
 				const topY = s.y + s.h;
 
 				// Centro y radio del escudo
-				const shieldCX = player.x + player.w/2;
-				const shieldCY = player.y + player.h/2;
-				const R        = player.w/2 + 10;
+				const shieldCX = player.x + player.w / 2;
+				const shieldCY = player.y + player.h / 2;
+				const R = player.w / 2 + 10;
 
 				// Distancia horizontal entre rayo y centro del escudo
 				const dx = shieldCX - cx;
@@ -1739,12 +1817,12 @@
 				// Si el escudo está activado y el rayo cae sobre la circunferencia (|dx| ≤ R)
 				if (player.shieldLevel > 0 && Math.abs(dx) <= R) {
 					// Altura de intersección: cy - √(R² - dx²)
-					const deltaY = Math.sqrt(R*R - dx*dx);
+					const deltaY = Math.sqrt(R * R - dx * dx);
 					yEnd = shieldCY - deltaY;
 				}
 
 				ctx.strokeStyle = "red";
-				ctx.lineWidth   = 2;	//Ancho del rayo láser
+				ctx.lineWidth = 2;	//Ancho del rayo láser
 				ctx.beginPath();
 				ctx.moveTo(cx, topY);
 				ctx.lineTo(cx, yEnd);
@@ -1755,7 +1833,7 @@
 		function drawFractalShips() {
 			fractalShips.forEach(s => {
 				const shake = Math.sin(s.oscill) * 4;
-				const xPos  = s.x + shake;
+				const xPos = s.x + shake;
 				ctx.drawImage(fractalShipImage, xPos, s.y, s.w, s.h);
 
 				// barra de vida
@@ -1775,7 +1853,7 @@
 					ctx.fillStyle = "orange";
 					ctx.fillRect(b.x, b.y, b.size, b.size);
 				}
-  			});
+			});
 		}
 
 		function drawWaveSlices() {
@@ -1788,7 +1866,7 @@
 
 				// crece y avanza hacia abajo
 				w.radius += w.expandSpeed;
-				w.y      += w.expandSpeed;
+				w.y += w.expandSpeed;
 
 				// dibuja arco fijo, opacidad constante
 				ctx.beginPath();
@@ -1798,7 +1876,7 @@
 					w.startAngle,
 					w.endAngle
 				);
-				ctx.lineWidth   = w.thickness;
+				ctx.lineWidth = w.thickness;
 				ctx.strokeStyle = 'rgba(0, 200, 255, 1)';
 				ctx.stroke();
 			}
@@ -1820,13 +1898,13 @@
 				ctx.beginPath();
 				ctx.arc(w.x, w.y, w.radius, 0, 2 * Math.PI);
 				ctx.strokeStyle = `rgba(0, 0, 0, ${w.alpha})`;
-				ctx.lineWidth   = w.thickness;
+				ctx.lineWidth = w.thickness;
 				ctx.stroke();
 				ctx.restore();
 
 				// actualiza expansión y atenuación
 				w.radius += blindWaveSpeed;
-				w.alpha  = Math.max(0, w.alpha - w.fadeSpeed);
+				w.alpha = Math.max(0, w.alpha - w.fadeSpeed);
 			}
 		}
 
@@ -1842,41 +1920,41 @@
 			ctx.drawImage(mirrorImage,
 				mirrorShip.x, mirrorShip.y,
 				mirrorShip.w, mirrorShip.h);
-			
+
 			// vida de la nave espejo
-			const barWidth  = mirrorShip.w;
+			const barWidth = mirrorShip.w;
 			const barHeight = 6;
-			const ratio     = mirrorShip.hp / mirrorShip.hpIni;
+			const ratio = mirrorShip.hp / mirrorShip.hpIni;
 
 			// fondo de la barra
 			ctx.fillStyle = "#444";
 			ctx.fillRect(
-				mirrorShip.x, 
-				mirrorShip.y - barHeight - 4, 
-				barWidth, 
+				mirrorShip.x,
+				mirrorShip.y - barHeight - 4,
+				barWidth,
 				barHeight
 			);
 
 			// parte viva
 			ctx.fillStyle = "lime";
 			ctx.fillRect(
-				mirrorShip.x, 
-				mirrorShip.y - barHeight - 4, 
-				barWidth * ratio, 
+				mirrorShip.x,
+				mirrorShip.y - barHeight - 4,
+				barWidth * ratio,
 				barHeight
 			);
 
 			// si tiene escudo se dibuja
 			if (mirrorShip.shieldLevel > 0) {
-				const colors = ["white","blue","red"];
+				const colors = ["white", "blue", "red"];
 				ctx.strokeStyle = colors[mirrorShip.shieldLevel - 1];
 				ctx.lineWidth = 1 + mirrorShip.shieldLevel;
 				ctx.beginPath();
 				ctx.arc(
-				mirrorShip.x + mirrorShip.w/2,
-				mirrorShip.y + mirrorShip.h/2,
-				mirrorShip.w/2 + 10,
-				0, Math.PI*2
+					mirrorShip.x + mirrorShip.w / 2,
+					mirrorShip.y + mirrorShip.h / 2,
+					mirrorShip.w / 2 + 10,
+					0, Math.PI * 2
 				);
 				ctx.stroke();
 			}
@@ -1902,7 +1980,7 @@
 				const b = mirrorBullets[i];
 				ctx.fillRect(b.x, b.y, 4, 10);
 				b.y += bulletSpeed;
-				
+
 			}
 		}
 
@@ -1911,20 +1989,20 @@
 			const now = Date.now();
 			enemies.forEach(e => {
 				if (e.inBurst) {
-				if (e.shotsFired < e.burstShots && now - e.lastShotTime >= 200) {
-					enemyBullets.push({
-						x: e.x + e.width/2 - 2,
-						y: e.y + e.height
-					});
-					e.shotsFired++;
-					e.lastShotTime = now;
-				}
-				if (e.shotsFired >= e.burstShots) {
-					e.inBurst = false;
-					e.burstStart = now;
-				}
+					if (e.shotsFired < e.burstShots && now - e.lastShotTime >= 200) {
+						enemyBullets.push({
+							x: e.x + e.width / 2 - 2,
+							y: e.y + e.height
+						});
+						e.shotsFired++;
+						e.lastShotTime = now;
+					}
+					if (e.shotsFired >= e.burstShots) {
+						e.inBurst = false;
+						e.burstStart = now;
+					}
 				} else if (now - e.burstStart >= 2000) {
-					e.inBurst    = true;
+					e.inBurst = true;
 					e.shotsFired = 0;
 				}
 			});
@@ -1938,13 +2016,13 @@
 				if (s.laserOn) {
 					// Apagar tras 3s
 					if (now - s.laserStart >= 3000) {
-						s.laserOn   = false;
-						s.lastShot  = now;       // marca fin de rayo
+						s.laserOn = false;
+						s.lastShot = now;       // marca fin de rayo
 					}
 				} else {
 					// Espera 2s tras fin antes de volver a disparar
 					if (now - s.lastShot >= s.cooldown) {
-						s.laserOn    = true;
+						s.laserOn = true;
 						s.laserStart = now;
 					}
 				}
@@ -1957,42 +2035,42 @@
 				if (s.waiting) return;
 
 				if (now - s.lastShot >= s.cooldown) {
-				s.lastShot = now;
-				// Bala madre
-				fractalBullets.push({
-					x: s.x + s.w/2 - 4,
-					y: s.y + s.h,
-					size: 30,
-					dx: 0,            // sin horizontal para la bala central
-					dy: 4,
-					splitAt:s.y + s.h +	(canvas.height - (s.y + s.h)) * (0.1 + 0.8 * Math.random())
-				});
-				// Nuevo cooldown aleatorio
-				s.cooldown = 1000 + 2000 * Math.random();
+					s.lastShot = now;
+					// Bala madre
+					fractalBullets.push({
+						x: s.x + s.w / 2 - 4,
+						y: s.y + s.h,
+						size: 30,
+						dx: 0,            // sin horizontal para la bala central
+						dy: 4,
+						splitAt: s.y + s.h + (canvas.height - (s.y + s.h)) * (0.1 + 0.8 * Math.random())
+					});
+					// Nuevo cooldown aleatorio
+					s.cooldown = 1000 + 2000 * Math.random();
 				}
 			});
 		}
 
 		function updateFractalBullets() {
-			for (let i=fractalBullets.length-1; i>=0; i--) {
+			for (let i = fractalBullets.length - 1; i >= 0; i--) {
 				const b = fractalBullets[i];
 				b.x += b.dx || 0;
 				b.y += b.dy;
 				// Si las balas salen fuera se eliminan
-				if (b.y > canvas.height) { 
-					fractalBullets.splice(i,1); 
-					continue; 
+				if (b.y > canvas.height) {
+					fractalBullets.splice(i, 1);
+					continue;
 				}
 				// fragmentación de las balas
-    			if (typeof b.splitAt === 'number' && b.y >= b.splitAt) {// solo fragmentar si splitAt es un número válido
+				if (typeof b.splitAt === 'number' && b.y >= b.splitAt) {// solo fragmentar si splitAt es un número válido
 					if (b.y >= b.splitAt) {
-						fractalBullets.splice(i,1);
+						fractalBullets.splice(i, 1);
 						// Tres fragmentos
 						[0, -30, 30].forEach(angle => {
-							const rad = angle * Math.PI/180;
+							const rad = angle * Math.PI / 180;
 							const speed = 4;
 							fractalBullets.push({
-								x: b.x, 
+								x: b.x,
 								y: b.y,
 								size: 16,
 								dx: speed * Math.sin(rad),
@@ -2010,7 +2088,7 @@
 			// Disparar ondas paralizantes con cierta probabilidad
 			satellites.forEach(s => {
 				if (Math.random() < s.probShot) {
-					const cx = s.x + s.size/2;
+					const cx = s.x + s.size / 2;
 					const cy = s.y + s.size;
 					// 3 ondas en ráfaga, escalonadas 8 frames (~0.13 s)
 					for (let i = 0; i < 3; i++) {
@@ -2026,8 +2104,8 @@
 			blindSatellites.forEach(s => {
 				if (now >= s.nextWaveTime) {
 					// centro de la futura onda
-					const cx = s.x + s.size/2;
-					const cy = s.y + s.size/2;
+					const cx = s.x + s.size / 2;
+					const cy = s.y + s.size / 2;
 
 					// distancia máxima a una esquina del canvas (se calcula para saber 
 					// cuándo sale de pantalla y poder eliminarla)
@@ -2069,8 +2147,8 @@
 
 			// genera balas idénticas a las del jugador
 			const type = grade.type;
-			const baseX = mirrorShip.x + mirrorShip.w/2;
-			const y0    = mirrorShip.y + mirrorShip.h;
+			const baseX = mirrorShip.x + mirrorShip.w / 2;
+			const y0 = mirrorShip.y + mirrorShip.h;
 
 			if (type === "simple") {
 				mirrorBullets.push({ x: baseX - 2, y: y0 });
@@ -2091,8 +2169,8 @@
 		// ===== Quiz =====
 		function startQuiz(origin) {
 			quizOrigin = origin;
-			let a = 1 + Math.floor(Math.random()*9),
-				b = 1 + Math.floor(Math.random()*9),
+			let a = 1 + Math.floor(Math.random() * 9),
+				b = 1 + Math.floor(Math.random() * 9),
 				c = a * b;
 
 			quizOptions = [];
@@ -2101,14 +2179,14 @@
 				//quizQuestion = `¿Qué número × ${a} = ${c}?`;
 				quizQuestion = `¿Qué número falta?<br><strong>? × ${a} = ${c}</strong>`;
 				// posición de la respuesta correcta
-				quizIdx = Math.floor(Math.random()*3);
+				quizIdx = Math.floor(Math.random() * 3);
 
-				for (let i=0; i<3; i++) {
+				for (let i = 0; i < 3; i++) {
 					if (i === quizIdx) {
 						quizOptions.push(b);
 					} else {
 						let w;
-						do { w = 1 + Math.floor(Math.random()*9); }
+						do { w = 1 + Math.floor(Math.random() * 9); }
 						while (w === b || quizOptions.includes(w));
 						quizOptions.push(w);
 					}
@@ -2116,12 +2194,12 @@
 			} else {
 				// Lógica anterior (multiplicación completa)
 				quizQuestion = `¿Cuánto es?<br><strong>${a} × ${b}</strong>`;
-				quizIdx = Math.floor(Math.random()*3);
-				for (let i=0; i<3; i++) {
+				quizIdx = Math.floor(Math.random() * 3);
+				for (let i = 0; i < 3; i++) {
 					if (i === quizIdx) quizOptions.push(c);
 					else {
 						let w;
-						do { w = c + (Math.floor(Math.random()*11) - 5); }
+						do { w = c + (Math.floor(Math.random() * 11) - 5); }
 						while (w === c || quizOptions.includes(w));
 						quizOptions.push(w);
 					}
@@ -2131,20 +2209,20 @@
 			// Mostrar overlay…
 			document.getElementById("quizOverlay").style.display = "flex";
 			document.getElementById("quizQuestion").innerHTML = quizQuestion;
-			quizOptions.forEach((opt,i) => {
+			quizOptions.forEach((opt, i) => {
 				document.getElementById(`option${i}`).textContent =
-				(i===0?"⬅️":i===1?"⬆️":"➡️") + " " + opt;
+					(i === 0 ? "⬅️" : i === 1 ? "⬆️" : "➡️") + " " + opt;
 			});
-			quizStart   = Date.now();
-			quizAnswered= false;
-			quizActive  = true;
+			quizStart = Date.now();
+			quizAnswered = false;
+			quizActive = true;
 			quizLoop();
 		}
 
 		function endQuiz(correct) {
 			if (quizAnswered) return;
 			quizAnswered = true;
-			quizActive   = false;
+			quizActive = false;
 			document.getElementById("quizOverlay").style.display = "none";
 
 			if (quizOrigin === "shield") {	//Pregunta de bonus de escudo
@@ -2162,17 +2240,17 @@
 					} else {
 						score += POINTS.shield;
 						popups.push({
-							x: player.x + player.w/2,
+							x: player.x + player.w / 2,
 							y: player.y,
 							text: `+${POINTS.shield}`,
 							alpha: 1
 						});
 					}
-				}else {
+				} else {
 					quizFails++;
 				}
 			} else {	//Pregunta de bonus de disparo
-				if(correct){
+				if (correct) {
 					quizCorrects++;
 					const maxGrade = maxGradeForLevel(currentLevel);
 					if (shotGrade < maxGrade) {
@@ -2194,35 +2272,35 @@
 			//requestAnimationFrame(gameLoop);
 		}
 
-		function quizLoop(){
-			if(!quizActive) return;
+		function quizLoop() {
+			if (!quizActive) return;
 
-			const rem = 3 - Math.floor((Date.now()-quizStart)/1000);
+			const rem = 3 - Math.floor((Date.now() - quizStart) / 1000);
 			document.getElementById("quizTimer").textContent = `Tiempo: ${rem}s`;
 
-			if(rem<=0){ endQuiz(false); return; }
+			if (rem <= 0) { endQuiz(false); return; }
 
 			requestAnimationFrame(quizLoop);
 		}
 
 		// ===== Colisiones =====
-		function checkCollisions(){
+		function checkCollisions() {
 			// Balas del jugador
-			bullets.forEach((b,bi)=>{
+			bullets.forEach((b, bi) => {
 				// contra rocas
-				rocks.forEach((r,ri)=>{
-					if(b.x<r.x+r.size && b.x+4>r.x &&
-					 b.y<r.y+r.size && b.y+10>r.y){
-						bullets.splice(bi,1);
+				rocks.forEach((r, ri) => {
+					if (b.x < r.x + r.size && b.x + 4 > r.x &&
+						b.y < r.y + r.size && b.y + 10 > r.y) {
+						bullets.splice(bi, 1);
 						r.hp--;
-						if(r.hp<=0){
+						if (r.hp <= 0) {
 							score += r.strong ? POINTS.strongRock : POINTS.rock;
 							// Explosión en la roca
 							explosions.push({
-								x: r.x + r.size/2,
-								y: r.y + r.size/2,
+								x: r.x + r.size / 2,
+								y: r.y + r.size / 2,
 								radius: 0,
-								maxRadius: r.strong?40:30,
+								maxRadius: r.strong ? 40 : 30,
 								alpha: 1
 							});
 							//Texto con los puntos conseguidos
@@ -2232,7 +2310,7 @@
 								text: '+' + (r.strong ? POINTS.strongRock : POINTS.rock),
 								alpha: 1
 							});
-							rocks.splice(ri,1);//Eliminar instacia de roca
+							rocks.splice(ri, 1);//Eliminar instacia de roca
 
 							// Sonido de explosión
 							if (!muted) {
@@ -2280,13 +2358,13 @@
 							});
 
 							//Hace aparecer otra nave para reemplazar la sustituida
-							
+
 							if (isInfiniteMode) { // Modo infinito
-								nextShipSpawnTime = Date.now() + 2000; 
-							}else{ // Modo campaña
-								if (Math.random()<0.5){
+								nextShipSpawnTime = Date.now() + 2000;
+							} else { // Modo campaña
+								if (Math.random() < 0.5) {
 									spawnEnemy("left");
-								}else{
+								} else {
 									spawnEnemy("right");
 								}
 							}
@@ -2296,14 +2374,14 @@
 				}
 
 				//Contra naves láser
-				for (let li=laserShips.length-1; li>=0; li--){
+				for (let li = laserShips.length - 1; li >= 0; li--) {
 					const s = laserShips[li];
-					if (b.x< s.x+s.w && b.x+4> s.x && b.y< s.y+s.h && b.y+10> s.y) {
-						bullets.splice(bi,1);
+					if (b.x < s.x + s.w && b.x + 4 > s.x && b.y < s.y + s.h && b.y + 10 > s.y) {
+						bullets.splice(bi, 1);
 						s.hp--;
 						s.oscill = 10;
-						if(s.hp<=0){
-							laserShips.splice(li,1);
+						if (s.hp <= 0) {
+							laserShips.splice(li, 1);
 							score += POINTS.laser;
 
 							// Sonido de explosión
@@ -2313,19 +2391,19 @@
 
 							// Efecto explosión
 							explosions.push({
-								x: s.x + s.w/2,
-								y: s.y + s.h/2,
+								x: s.x + s.w / 2,
+								y: s.y + s.h / 2,
 								radius: 0,
 								maxRadius: 40,
 								alpha: 1
 							});
 
 							// Puntos en pantalla
-							popups.push({ 
-								x:s.x+s.w/2, 
-								y:s.y, 
-								text:"+" + POINTS.laser, 
-								alpha:1
+							popups.push({
+								x: s.x + s.w / 2,
+								y: s.y,
+								text: "+" + POINTS.laser,
+								alpha: 1
 							});
 
 							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
@@ -2335,14 +2413,14 @@
 				}
 
 				//Contra naves fractales
-				for (let li=fractalShips.length-1; li>=0; li--){
+				for (let li = fractalShips.length - 1; li >= 0; li--) {
 					const s = fractalShips[li];
-					if (b.x< s.x+s.w && b.x+4> s.x && b.y< s.y+s.h && b.y+10> s.y) {
-						bullets.splice(bi,1);
+					if (b.x < s.x + s.w && b.x + 4 > s.x && b.y < s.y + s.h && b.y + 10 > s.y) {
+						bullets.splice(bi, 1);
 						s.hp--;
 						s.oscill = 10;
-						if(s.hp<=0){
-							fractalShips.splice(li,1);
+						if (s.hp <= 0) {
+							fractalShips.splice(li, 1);
 							score += POINTS.fractal;
 
 							// Sonido de explosión
@@ -2352,19 +2430,19 @@
 
 							// Efecto explosión
 							explosions.push({
-								x: s.x + s.w/2,
-								y: s.y + s.h/2,
+								x: s.x + s.w / 2,
+								y: s.y + s.h / 2,
 								radius: 0,
 								maxRadius: 40,
 								alpha: 1
 							});
-							
+
 							// Puntos por pantalla
-							popups.push({ 
-								x:s.x+s.w/2, 
-								y:s.y, 
-								text:"+" + POINTS.fractal, 
-								alpha:1
+							popups.push({
+								x: s.x + s.w / 2,
+								y: s.y,
+								text: "+" + POINTS.fractal,
+								alpha: 1
 							});
 
 							if (isInfiniteMode) { nextShipSpawnTime = Date.now() + 2000; }
@@ -2394,7 +2472,7 @@
 
 						// chequeo de destrucción
 						if (mirrorShip.hp <= 0) {
-							mirrorDefeated =true	// Aviso de que la nave ha sido eliminada
+							mirrorDefeated = true	// Aviso de que la nave ha sido eliminada
 
 							// Sonido de explosión
 							if (!muted) {
@@ -2404,15 +2482,15 @@
 							// puntuación por pantalla
 							score += POINTS.mirror;
 							popups.push({
-								x: mirrorShip.x + mirrorShip.w/2,
+								x: mirrorShip.x + mirrorShip.w / 2,
 								y: mirrorShip.y,
 								text: "+" + POINTS.mirror,
 								alpha: 1
 							});
 							// Efecto de explosión
 							explosions.push({
-								x: mirrorShip.x + mirrorShip.w/2,
-								y: mirrorShip.y + mirrorShip.h/2,
+								x: mirrorShip.x + mirrorShip.w / 2,
+								y: mirrorShip.y + mirrorShip.h / 2,
 								radius: 0,
 								maxRadius: 60,
 								alpha: 1
@@ -2420,7 +2498,7 @@
 							// eliminar la nave espejo
 							mirrorShip = null;
 						}
-					}	
+					}
 				}
 
 				//Contra cometas
@@ -2443,8 +2521,8 @@
 
 							// Explosión del cometa
 							explosions.push({
-								x: c.x + c.size/2,
-								y: c.y + c.size/2,
+								x: c.x + c.size / 2,
+								y: c.y + c.size / 2,
 								radius: 0,
 								maxRadius: 30,
 								alpha: 1
@@ -2461,7 +2539,7 @@
 						}
 					}
 				});
-				
+
 				//Contra satélites paralizadores
 				satellites.forEach((s, si) => {
 					if (
@@ -2470,8 +2548,8 @@
 					) {
 						bullets.splice(bi, 1);
 						s.hp--;
-						if(s.hp<=0){
-							satellites.splice(si,1);
+						if (s.hp <= 0) {
+							satellites.splice(si, 1);
 							score += POINTS.satellite;
 
 							// Sonido de explosión
@@ -2481,19 +2559,19 @@
 
 							// Efecto explosión
 							explosions.push({
-								x: s.x + s.size/2,
-								y: s.y + s.size/2,
-								radius:    0,
-								maxRadius: 20,    
-								alpha:     1
+								x: s.x + s.size / 2,
+								y: s.y + s.size / 2,
+								radius: 0,
+								maxRadius: 20,
+								alpha: 1
 							});
 
 							// Texto por pantalla
-							popups.push({ 
-								x: s.x + s.size/2,
-        						y: s.y,
-								text:"+" + POINTS.satellite, 
-								alpha:1
+							popups.push({
+								x: s.x + s.size / 2,
+								y: s.y,
+								text: "+" + POINTS.satellite,
+								alpha: 1
 							});
 
 							if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
@@ -2518,8 +2596,8 @@
 
 						// Efecto explosión
 						explosions.push({
-							x: s.x + s.size/2,
-							y: s.y + s.size/2,
+							x: s.x + s.size / 2,
+							y: s.y + s.size / 2,
 							radius: 0,
 							maxRadius: 20,
 							alpha: 1
@@ -2527,10 +2605,10 @@
 
 						// Puntos por pantalla
 						popups.push({
-							x: s.x + s.size/2,
+							x: s.x + s.size / 2,
 							y: s.y,
-							text:   "+" + POINTS.satellite,
-							alpha:  1
+							text: "+" + POINTS.satellite,
+							alpha: 1
 						});
 
 						if (isInfiniteMode) { nextSatelliteSpawnTime = Date.now() + 3000; }
@@ -2551,19 +2629,19 @@
 			});
 
 			// bonuses de disparo
-			bonuses.forEach((b,bi)=>{
-				if(b.x<player.x+player.w && b.x+b.size>player.x &&
-				b.y<player.y+player.h && b.y+b.size>player.y){
-					bonuses.splice(bi,1);
+			bonuses.forEach((b, bi) => {
+				if (b.x < player.x + player.w && b.x + b.size > player.x &&
+					b.y < player.y + player.h && b.y + b.size > player.y) {
+					bonuses.splice(bi, 1);
 					startQuiz("disparo");
 				}
 			});
 
 			// powerUps (Vidas)
-			powerUps.forEach((p,pi)=>{
-				if(p.x<player.x+player.w && p.x+p.size>player.x &&
-				p.y<player.y+player.h && p.y+p.size>player.y){
-					powerUps.splice(pi,1);
+			powerUps.forEach((p, pi) => {
+				if (p.x < player.x + player.w && p.x + p.size > player.x &&
+					p.y < player.y + player.h && p.y + p.size > player.y) {
+					powerUps.splice(pi, 1);
 
 					//Si estamos en en nivel final (permite tener más vidas de lo normal)
 					if (currentLevel === 10) {//Nivel 11 (enemigo final)
@@ -2584,8 +2662,8 @@
 							});
 						}
 					} else { //Todos los niveles menos el final
-						if(lives<maxLives){
-							lives++; 
+						if (lives < maxLives) {
+							lives++;
 							updateLivesDisplay();
 						} else {
 							score += POINTS.powerUp;
@@ -2598,25 +2676,25 @@
 							});
 						}
 					}
-					
+
 				}
 			});
 
 			// colisión rocas contra jugador
-			for(let i = rocks.length - 1; i >= 0; i--){
+			for (let i = rocks.length - 1; i >= 0; i--) {
 				const r = rocks[i];
-				if(
+				if (
 					r.x < player.x + player.w &&
 					r.x + r.size > player.x &&
 					r.y < player.y + player.h &&
 					r.y + r.size > player.y
-				){
+				) {
 					if (player.shieldLevel > 0) {
 						player.shieldLevel--;
 					} else {
 						explosions.push({
-							x: player.x + player.w/2,
-							y: player.y + player.h/2,
+							x: player.x + player.w / 2,
+							y: player.y + player.h / 2,
 							radius: 0,
 							maxRadius: 40,
 							alpha: 1
@@ -2624,11 +2702,11 @@
 						loseLife();
 						shotGrade = 0;
 					}
-					rocks.splice(i,1);
+					rocks.splice(i, 1);
 					break;
-				}       
+				}
 			}
-			
+
 			// Bonus de escudo contra jugador
 			shieldBonuses.forEach((s, si) => {
 				if (
@@ -2640,11 +2718,11 @@
 					shieldBonuses.splice(si, 1);
 					startQuiz("shield");
 				}
-			});			
+			});
 
 			// Balas naves enemigas básicas contra jugador
 			for (let i = enemyBullets.length - 1; i >= 0; i--) {
-				const 	b = enemyBullets[i];
+				const b = enemyBullets[i];
 				const now = Date.now();
 
 				const hitPlayer =
@@ -2667,26 +2745,26 @@
 				// Si no hay escudo y no estamos invencibles, restamos vida
 				else if (now - player.lastHitTime > player.invincibleTime) {
 					player.lastHitTime = now;
-					player.flashTime   = now;   // parpadeo
+					player.flashTime = now;   // parpadeo
 					loseLife();
 					updateLivesDisplay();
 				}
-			}			
+			}
 
 			//Colisión de láser con jugador
 			laserShips.forEach(s => {
 				const now = Date.now();
-				
+
 				if (!s.laserOn) return;
 
 				// centro X del haz y Y de salida
-				const cx   = s.x + s.w/2;
+				const cx = s.x + s.w / 2;
 				const topY = s.y + s.h;
 
 				// parámetros del escudo
-				const shieldCX = player.x + player.w/2;
-				const shieldCY = player.y + player.h/2;
-				const R        = player.w/2 + 10;
+				const shieldCX = player.x + player.w / 2;
+				const shieldCY = player.y + player.h / 2;
+				const R = player.w / 2 + 10;
 
 				// distancia horizontal al centro del escudo
 				const dx = shieldCX - cx;
@@ -2701,7 +2779,7 @@
 					else if (now - player.shieldTouchStart >= 500) {
 						player.shieldLevel--;
 						player.shieldTouchStart = now;  // reiniciamos el conteo para el siguiente nivel
-						updateHUD();                    
+						updateHUD();
 					}
 					return;  // no hacemos daño al jugador (el escudo lo ha bloqueado)
 				}
@@ -2717,7 +2795,7 @@
 
 				if (laserHitsPlayer && now - player.lastHitTime > player.invincibleTime) {
 					player.lastHitTime = now;
-					player.flashTime   = now;       // parpadeo
+					player.flashTime = now;       // parpadeo
 					if (player.shieldLevel > 0) {
 						player.shieldLevel--;
 					} else {
@@ -2728,10 +2806,10 @@
 			});
 
 			//Balas fragmentarias contra jugador
-			fractalBullets.forEach((b,i)=>{
-				if (b.x < player.x+player.w && b.x+b.size>player.x &&
-					b.y < player.y+player.h && b.y+b.size>player.y) {
-					fractalBullets.splice(i,1);
+			fractalBullets.forEach((b, i) => {
+				if (b.x < player.x + player.w && b.x + b.size > player.x &&
+					b.y < player.y + player.h && b.y + b.size > player.y) {
+					fractalBullets.splice(i, 1);
 					if (player.shieldLevel > 0) {
 						player.shieldLevel--;
 					} else if (Date.now() - player.lastHitTime > player.invincibleTime) {
@@ -2741,7 +2819,7 @@
 					}
 				}
 			});
-			
+
 			//Cometas contra jugador
 			comets.forEach((c, ci) => {
 				if (
@@ -2766,10 +2844,10 @@
 				const segments = 8;
 				const angleStep = (slice.endAngle - slice.startAngle) / segments;
 
-    			for (let i = 0; i <= segments; i++) {
+				for (let i = 0; i <= segments; i++) {
 					const angle = slice.startAngle + i * angleStep;
 					const px = slice.x + slice.radius * Math.cos(angle);
-      				const py = slice.y + slice.radius * Math.sin(angle);
+					const py = slice.y + slice.radius * Math.sin(angle);
 
 					// chequeo AABB contra jugador
 					if (
@@ -2816,24 +2894,24 @@
 
 		// ===== Movimiento jugador =====
 		const keys = {};
-		document.addEventListener("keydown", e=>{
-			if(quizActive){
+		document.addEventListener("keydown", e => {
+			if (quizActive) {
 				let sel = null;
-				if(e.code==="ArrowLeft") sel=0;
-				if(e.code==="ArrowUp")   sel=1;
-				if(e.code==="ArrowRight")sel=2;
-				if(sel!==null) endQuiz(sel===quizIdx);
+				if (e.code === "ArrowLeft") sel = 0;
+				if (e.code === "ArrowUp") sel = 1;
+				if (e.code === "ArrowRight") sel = 2;
+				if (sel !== null) endQuiz(sel === quizIdx);
 				return;
 			}
 
-			if(e.code==="KeyP") paused = !paused;
+			if (e.code === "KeyP") paused = !paused;
 
-			if (e.code==="KeyM") {
+			if (e.code === "KeyM") {
 				muted = !muted;
 				updateMuteIcon();
 				if (!muted) {
 					bgMusic.play();
-				} else { 
+				} else {
 					bgMusic.pause();
 				}
 				btnSoundMenu.textContent = muted ? "Sonido OFF" : "Sonido ON";
@@ -2869,18 +2947,18 @@
 				qPressCount = 0;
 			}
 
-			if(e.code==="KeyD") {
-				if (debugMode ){
+			if (e.code === "KeyD") {
+				if (debugMode) {
 					shotGrade = 4;
 				}
 			}
-			if(e.code==="KeyE") {
-				if (debugMode ){
+			if (e.code === "KeyE") {
+				if (debugMode) {
 					player.shieldLevel = 3;
 				}
 			}
 			if (e.code === "KeyL" && currentLevel < 10) {
-				if (debugMode ){
+				if (debugMode) {
 					// Limpia entidades
 					resetEntities();
 
@@ -2893,21 +2971,21 @@
 				}
 			};
 
-			if(e.code==="KeyI") {
-				if (debugMode ){
+			if (e.code === "KeyI") {
+				if (debugMode) {
 					inmortal = !inmortal;
 				}
 			};
 			// -------------------------
-			
+
 			keys[e.code] = true;
 		});
 
-		document.addEventListener("keyup", e=>{
+		document.addEventListener("keyup", e => {
 			keys[e.code] = false;
 		});
 
-		function movePlayer(){
+		function movePlayer() {
 			const now = Date.now();
 
 			// Solo mover si no está paralizado
@@ -2927,10 +3005,10 @@
 					bullets.push({ x: player.x + player.w / 2 - 2, y: player.y });
 				} else if (type === "double") {
 					bullets.push({ x: player.x + player.w / 2 - 6, y: player.y });
-  					bullets.push({ x: player.x + player.w / 2 + 2, y: player.y });
+					bullets.push({ x: player.x + player.w / 2 + 2, y: player.y });
 				} else if (type === "quadruple") {
 					// calcula el centro horizontal de la nave
-					const midX = player.x + player.w/2;
+					const midX = player.x + player.w / 2;
 					// offsets para las 4 líneas, separadas simétricamente
 					const offsets = [-23, -6, +2, +20];
 					offsets.forEach(off => {
@@ -2984,18 +3062,18 @@
 
 				// entrada o patrulla
 				if (s.entering) {//Entrada
-					if ((s.dx>0 && s.x < s.targetX) || (s.dx<0 && s.x > s.targetX)) {
+					if ((s.dx > 0 && s.x < s.targetX) || (s.dx < 0 && s.x > s.targetX)) {
 						s.x += s.dx;
 					} else {
 						s.entering = false; s.dx = 2;
 					}
 				} else {//Patrulla
 					s.x += s.dx;
-					if (s.x<0||s.x>canvas.width-s.w) s.dx *= -1;
+					if (s.x < 0 || s.x > canvas.width - s.w) s.dx *= -1;
 				}
 
 				// atenúa el temblor poco a poco
-    			s.oscill *= 0.9;
+				s.oscill *= 0.9;
 			});
 		}
 
@@ -3025,7 +3103,7 @@
 
 		function moveSatellite() {
 			// actualiza posición de cada satélite paralizador
-			satellites.forEach(s=> s.x += s.dx);
+			satellites.forEach(s => s.x += s.dx);
 		}
 
 		function moveBlindSatellites() {
@@ -3056,26 +3134,26 @@
 			for (let b of bullets) {
 				// Se esquivan sólo las balas que están entre las alturas del culo de la
 				// nave Espejo y la punta de la nave (si fuera el doble de larga)
-				if (b.y < mirrorShip.y + 2*mirrorShip.h && b.y > mirrorShip.y) {//qqq
-					const mx = mirrorShip.x + mirrorShip.w/2;   // centro de la Espejo
+				if (b.y < mirrorShip.y + 2 * mirrorShip.h && b.y > mirrorShip.y) {//qqq
+					const mx = mirrorShip.x + mirrorShip.w / 2;   // centro de la Espejo
 					const bx = b.x + 2;                         // centro aproximado de la bala
 					const dx = bx - mx;
 
 					if (Math.abs(dx) < mirrorShip.evadeThreshold) {
 						// si la bala viene por la derecha, se mueve a la izquierda, y viceversa
 						mirrorShip.vx = dx > 0
-						? -Math.abs(mirrorShip.vx)
-						:  Math.abs(mirrorShip.vx);
+							? -Math.abs(mirrorShip.vx)
+							: Math.abs(mirrorShip.vx);
 						break;
 					}
 				}
 			}
 		}
 
-		
+
 
 		// ===== Pantallas de fin de juego =====
-		function showGameOver(){
+		function showGameOver() {
 			gameRunning = false;
 			lastGameWasInfinite = isInfiniteMode;	//Si se ha perdido jugando al modo campaña o al modo infinito
 			captureLastRun();	// Graba los resultados de esta partida
@@ -3090,10 +3168,10 @@
 			//Datos por pantalla:
 			document.getElementById("endStats").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 			document.getElementById("gameOverScreen").style.display = "flex";
-			document.getElementById("ver-logros").onclick = () => { showAchievements();	};
+			document.getElementById("ver-logros").onclick = () => { showAchievements(); };
 		}
 
-		function showWin(){
+		function showWin() {
 			gameRunning = false;
 			captureLastRun();	// Graba los resultados de esta partida
 			if (isInfiniteMode) {
@@ -3112,13 +3190,13 @@
 			document.getElementById("endStatsWin").textContent = `Aciertos: ${quizCorrects} | Fallos: ${quizFails}`;
 			document.getElementById("winScreen").classList.add("win");
 			document.getElementById("winScreen").style.display = "flex";
-			document.getElementById("ver-logros-victoria").onclick = () => { showAchievements();	};
+			document.getElementById("ver-logros-victoria").onclick = () => { showAchievements(); };
 
 			startCelebration();
 		}
 
 		function resizeCanvas() {
-			confettiCanvas.width  = canvas.width;
+			confettiCanvas.width = canvas.width;
 			confettiCanvas.height = canvas.height;
 		}
 		window.addEventListener("resize", resizeCanvas);
@@ -3128,25 +3206,25 @@
 			confettiParticles.push({
 				x, y: -10,
 				vx: (Math.random() - 0.5) * 2,
-				vy:  2 + Math.random() * 3,
+				vy: 2 + Math.random() * 3,
 				size: 5 + Math.random() * 5,
-				color: `hsl(${Math.random()*360},80%,60%)`,
-				rot: Math.random() * Math.PI*2,
-				drot: (Math.random()-0.5)*0.2
+				color: `hsl(${Math.random() * 360},80%,60%)`,
+				rot: Math.random() * Math.PI * 2,
+				drot: (Math.random() - 0.5) * 0.2
 			});
 		}
 
 		function drawConfetti() {
-			confCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+			confCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 			confettiParticles.forEach((p, i) => {
 				p.x += p.vx; p.y += p.vy; p.rot += p.drot;
 				confCtx.save();
-				confCtx.translate(p.x,p.y);
+				confCtx.translate(p.x, p.y);
 				confCtx.rotate(p.rot);
 				confCtx.fillStyle = p.color;
-				confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+				confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
 				confCtx.restore();
-				if (p.y > confettiCanvas.height + 20) confettiParticles.splice(i,1);
+				if (p.y > confettiCanvas.height + 20) confettiParticles.splice(i, 1);
 			});
 		}
 
@@ -3155,27 +3233,27 @@
 		function spawnFirework() {
 			const cx = Math.random() * confettiCanvas.width;
 			const cy = Math.random() * confettiCanvas.height / 2;
-			const count = 30 + Math.random()*20;
-			const hue = Math.random()*360;
+			const count = 30 + Math.random() * 20;
+			const hue = Math.random() * 360;
 			for (let i = 0; i < count; i++) {
-				const angle = (i/count)*Math.PI*2;
+				const angle = (i / count) * Math.PI * 2;
 				fireworks.push({
-				x: cx, y: cy,
-				vx: Math.cos(angle)*(2+Math.random()*3),
-				vy: Math.sin(angle)*(2+Math.random()*3),
-				alpha: 1,
-				hue
+					x: cx, y: cy,
+					vx: Math.cos(angle) * (2 + Math.random() * 3),
+					vy: Math.sin(angle) * (2 + Math.random() * 3),
+					alpha: 1,
+					hue
 				});
 			}
 		}
 
 		function drawFireworks() {
-			fireworks.forEach((f,i) => {
+			fireworks.forEach((f, i) => {
 				f.x += f.vx; f.y += f.vy; f.alpha -= 0.02;
-				if (f.alpha <= 0) return fireworks.splice(i,1);
+				if (f.alpha <= 0) return fireworks.splice(i, 1);
 				confCtx.fillStyle = `hsla(${f.hue},80%,70%,${f.alpha})`;
 				confCtx.beginPath();
-				confCtx.arc(f.x, f.y, 2+Math.random()*2, 0, Math.PI*2);
+				confCtx.arc(f.x, f.y, 2 + Math.random() * 2, 0, Math.PI * 2);
 				confCtx.fill();
 			});
 		}
@@ -3194,7 +3272,7 @@
 			confettiCanvas.style.display = "block";
 			victoryMusic.currentTime = 0;
 			victoryMusic.play();
-			for (let i=0; i<200; i++) spawnConfetti();
+			for (let i = 0; i < 200; i++) spawnConfetti();
 			spawnFirework();
 			celebrationLoop();
 		}
@@ -3207,7 +3285,7 @@
 			victoryMusic.pause();
 		}
 
-		function restartGame(){
+		function restartGame() {
 			// Reset variables 
 			resetBasicVariables();
 
@@ -3215,12 +3293,12 @@
 				// Configuración para reiniciar en MODO INFINITO
 				isInfiniteMode = true;
 				currentLevel = levels.length - 1; // Apunta al último nivel (el infinito)
-				scoreGoal    = Infinity;
+				scoreGoal = Infinity;
 			} else {
 				// Configuración para reiniciar en MODO CAMPAÑA 
 				isInfiniteMode = false;
 				currentLevel = 0;
-				scoreGoal    = levels[0].goal;
+				scoreGoal = levels[0].goal;
 			}
 
 			// Reiniciar estado del jugador
@@ -3231,11 +3309,11 @@
 
 			// Ocultar pantallas de fin
 			document.getElementById("gameOverScreen").style.display = "none";
-			document.getElementById("winScreen").style.display      = "none";
+			document.getElementById("winScreen").style.display = "none";
 
 			// Limpia la celebración de ganar el juego
 			stopCelebration();
-  			document.getElementById("winScreen").style.display = "none";
+			document.getElementById("winScreen").style.display = "none";
 
 			updateLivesDisplay();
 			updateHUD();
@@ -3245,25 +3323,25 @@
 
 		function resetPlayer() {
 			// Posición central inferior
-			player.x            = canvas.width  / 2 - player.w / 2;
-			player.y            = canvas.height - player.h - 20;
+			player.x = canvas.width / 2 - player.w / 2;
+			player.y = canvas.height - player.h - 20;
 			// Estado de escudo e invencibilidad
-			player.shieldLevel  = 0;
-			player.lastHitTime  = 0;
+			player.shieldLevel = 0;
+			player.lastHitTime = 0;
 			player.shieldTouchStart = 0;
 			// invencibilidad
-			player.flashTime    = 0;
+			player.flashTime = 0;
 			// Parálisis
-			player.paralyzeEnd  = 0;
-		
+			player.paralyzeEnd = 0;
+
 		}
 
-		document.getElementById("restartBtn").onclick    = restartGame;
+		document.getElementById("restartBtn").onclick = restartGame;
 		document.getElementById("restartWinBtn").onclick = restartGame;
 
 
 		//Limpieza entidades que salen de la pantalla
-		function cleanEntities(){
+		function cleanEntities() {
 			// Balas fuera de pantalla
 			for (let i = bullets.length - 1; i >= 0; i--) {
 				if (bullets[i].y < -10) bullets.splice(i, 1);
@@ -3276,12 +3354,12 @@
 
 			// Rocas fuera de pantalla 
 			for (let i = rocks.length - 1; i >= 0; i--) {
-				if(rocks[i].y>canvas.height) rocks.splice(i,1);
+				if (rocks[i].y > canvas.height) rocks.splice(i, 1);
 			}
 
 			// Cometas fuera de pantalla 
 			for (let i = comets.length - 1; i >= 0; i--) {
-				if(comets[i].y>canvas.height) comets.splice(i,1);
+				if (comets[i].y > canvas.height) comets.splice(i, 1);
 			}
 
 			// Bonus de disparo fuera de pantalla
@@ -3346,18 +3424,18 @@
 			for (let i = mirrorBullets.length - 1; i >= 0; i--) {
 				if (mirrorBullets[i].y > canvas.height + 10) mirrorBullets.splice(i, 1);
 			}
-			
+
 		}
 
 		function resetEntities() {
-			bullets.length       = 0;
-			rocks.length         = 0;
-			bonuses.length       = 0;
-			powerUps.length      = 0;
-			explosions.length    = 0;
-			popups.length        = 0;
-			enemies.length       = 0;
-			enemyBullets.length  = 0;
+			bullets.length = 0;
+			rocks.length = 0;
+			bonuses.length = 0;
+			powerUps.length = 0;
+			explosions.length = 0;
+			popups.length = 0;
+			enemies.length = 0;
+			enemyBullets.length = 0;
 			shieldBonuses.length = 0;
 
 			// Apagar rayos láser y reiniciar temporizadores
@@ -3367,11 +3445,11 @@
 				s.laserStart = 0;
 				s.shieldHitTime = null;
 			});
-			laserShips.length    = 0;
-			fractalShips.length   = 0;
-  			fractalBullets.length = 0;
-			waveSlices.length    = 0;    
-  			satellites.length    = 0;    
+			laserShips.length = 0;
+			fractalShips.length = 0;
+			fractalBullets.length = 0;
+			waveSlices.length = 0;
+			satellites.length = 0;
 			blindSatellites.length = 0;
 			blindWaves.length = 0;
 			absorberSatellites.length = 0;
@@ -3382,19 +3460,19 @@
 		}
 
 		function resetBasicVariables() {
-			lives        = maxLives;
-			score        = 0;
-			shotGrade    = 0;
+			lives = maxLives;
+			score = 0;
+			shotGrade = 0;
 			quizCorrects = 0;
-			quizFails    = 0;
-			startTime    = Date.now();
-			gameRunning  = true;
-			paused       = false;
-			levelActive  = false;
-			quizActive   = false;
+			quizFails = 0;
+			startTime = Date.now();
+			gameRunning = true;
+			paused = false;
+			levelActive = false;
+			quizActive = false;
 			player.shieldLevel = 0;
 			player.lastHitTime = 0;
-			player.flashTime   = 0;
+			player.flashTime = 0;
 		}
 
 		// Funciones de audio
@@ -3439,7 +3517,7 @@
 			if (currentLevel === 10 && extraLives > 0) {
 				extraLives--;
 			} else {
-				if (!inmortal){
+				if (!inmortal) {
 					lives--;
 				}
 			}
@@ -3466,7 +3544,7 @@
 					fails: quizFails,
 					correctPct,
 					failPct,
-					score: score 
+					score: score
 				};
 			} else {
 				lastRun = {
@@ -3483,32 +3561,32 @@
 
 		function updateAchievementsOverlay() {
 			// Estadísticas de la última partida
-			document.getElementById("achvLevel").textContent     = lastRun.level;
-			document.getElementById("achvTime").textContent      = formatMMSS(lastRun.timeSec);
-			document.getElementById("achvAnswers").textContent   = lastRun.answers;
-			document.getElementById("achvCorrects").textContent  = `${lastRun.corrects} (${lastRun.correctPct}%)`;
-			document.getElementById("achvFails").textContent     = `${lastRun.fails} (${lastRun.failPct}%)`;
+			document.getElementById("achvLevel").textContent = lastRun.level;
+			document.getElementById("achvTime").textContent = formatMMSS(lastRun.timeSec);
+			document.getElementById("achvAnswers").textContent = lastRun.answers;
+			document.getElementById("achvCorrects").textContent = `${lastRun.corrects} (${lastRun.correctPct}%)`;
+			document.getElementById("achvFails").textContent = `${lastRun.fails} (${lastRun.failPct}%)`;
 
 			// DEstadísticas del Mejor tiempo
 			if (bestTimeRecord) {
 				const s = bestTimeRecord.stats;
-				document.getElementById("recBestTimeName").textContent     = bestTimeRecord.name;
-				document.getElementById("recBestTimeTime").innerHTML      = `<strong>${formatMMSS(s.timeSec)}</strong>`;
+				document.getElementById("recBestTimeName").textContent = bestTimeRecord.name;
+				document.getElementById("recBestTimeTime").innerHTML = `<strong>${formatMMSS(s.timeSec)}</strong>`;
 				document.getElementById("recBestTimeQuestions").textContent = s.answers;
 				document.getElementById("recBestTimeCorrects").textContent = `${s.corrects} (${s.correctPct}%)`;
-				document.getElementById("recBestTimeFails").textContent    = `${s.fails} (${s.failPct}%)`;
-				document.getElementById("recBestTimeLevel").textContent    = s.level;
+				document.getElementById("recBestTimeFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestTimeLevel").textContent = s.level;
 			}
 
 			// Estadísticas del que tiene Más aciertos
 			if (bestCorrectsRecord) {
 				const s = bestCorrectsRecord.stats;
-				document.getElementById("recBestCorrName").textContent      = bestCorrectsRecord.name;
-				document.getElementById("recBestCorrTime").textContent      = formatMMSS(s.timeSec);
+				document.getElementById("recBestCorrName").textContent = bestCorrectsRecord.name;
+				document.getElementById("recBestCorrTime").textContent = formatMMSS(s.timeSec);
 				document.getElementById("recBestCorrQuestions").textContent = s.answers;
-				document.getElementById("recBestCorrCorrects").innerHTML    = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
-				document.getElementById("recBestCorrFails").textContent     = `${s.fails} (${s.failPct}%)`;
-				document.getElementById("recBestCorrLevel").textContent     = s.level;
+				document.getElementById("recBestCorrCorrects").innerHTML = `<strong>${s.corrects} (${s.correctPct}%)</strong>`;
+				document.getElementById("recBestCorrFails").textContent = `${s.fails} (${s.failPct}%)`;
+				document.getElementById("recBestCorrLevel").textContent = s.level;
 			}
 		}
 
@@ -3530,7 +3608,7 @@
 				document.getElementById("recInfBestTimeFails").textContent = `${s.fails} (${s.failPct}%)`;
 				document.getElementById("recInfBestTimeScore").textContent = s.score;
 			}
-			
+
 			// Récord: Más aciertos (Infinito)
 			if (bestCorrectsRecordInfinite) {
 				const s = bestCorrectsRecordInfinite.stats;
@@ -3592,7 +3670,7 @@
 
 		function checkRecords() {
 			// --- Mejor tiempo (buscamos tiempo menor) ---
-			if (gameWon){
+			if (gameWon) {
 				if (!bestTimeRecord || lastRun.timeSec < bestTimeRecord.stats.timeSec) {
 					const name = prompt("¡¡¡Nuevo récord de TIEMPO!!!: Escribe tu nombre!");
 					bestTimeRecord = { name: name || "—", stats: { ...lastRun } };
@@ -3624,10 +3702,9 @@
 			// --- Más aciertos ---
 			const currentCorrects = lastRunInfinite.corrects;
 			const currentPct = lastRunInfinite.correctPct;
-			if (!bestCorrectsRecordInfinite 
-				|| currentCorrects > bestCorrectsRecordInfinite.stats.corrects 
-				|| (currentCorrects === bestCorrectsRecordInfinite.stats.corrects && currentPct > bestCorrectsRecordInfinite.stats.correctPct)) 
-			{
+			if (!bestCorrectsRecordInfinite
+				|| currentCorrects > bestCorrectsRecordInfinite.stats.corrects
+				|| (currentCorrects === bestCorrectsRecordInfinite.stats.corrects && currentPct > bestCorrectsRecordInfinite.stats.correctPct)) {
 				const name = prompt("¡¡¡Nuevo récord de ACIERTOS (∞)!!!\nNadie ha acertado tanto en el modo infinito.\n\nEscribe tu nombre:");
 				bestCorrectsRecordInfinite = { name: name || "—", stats: { ...lastRunInfinite } };
 				localStorage.setItem("bestCorrectsRecordInfinite", JSON.stringify(bestCorrectsRecordInfinite));
@@ -3665,7 +3742,7 @@
 
 			switch (randomType) {
 				case 'satellite':
-					{ 
+					{
 						const size = 30;
 						const spawnSide = Math.random() < 0.5 ? "left" : "right";
 						const x = spawnSide === "left" ? -size : canvas.width + size;
@@ -3734,18 +3811,18 @@
 		}
 
 		// ===== Game Loop =====
-		function gameLoop(){
-			if(!gameRunning) return;
+		function gameLoop() {
+			if (!gameRunning) return;
 
-			if(levelActive){
+			if (levelActive) {
 				requestAnimationFrame(gameLoop);
 				return;
 			}
-			if(quizActive){
+			if (quizActive) {
 				requestAnimationFrame(gameLoop);
 				return;
 			}
-			if(paused){
+			if (paused) {
 				requestAnimationFrame(gameLoop);
 
 				ctx.fillStyle = "rgba(0, 0, 0, 0.01)"; // fondo semitransparente
@@ -3759,16 +3836,16 @@
 			}
 
 			//Comprobar si se ha perdido
-			if(lives<=0){ showGameOver(); return; }
+			if (lives <= 0) { showGameOver(); return; }
 
 
 			if (!isInfiniteMode) {	// Si es el modo de juego normal (modo campaña)
-				if(score>=scoreGoal){
-					if(currentLevel < 10){
+				if (score >= scoreGoal) {
+					if (currentLevel < 10) {
 						resetEntities();
 
 						currentLevel++;
-						score     = 0;
+						score = 0;
 						scoreGoal = levels[currentLevel].goal;
 						updateHUD();
 						showLevelOverlay();
@@ -3776,7 +3853,7 @@
 						requestAnimationFrame(gameLoop);
 						return;
 					} else {
-						gameWon = true	
+						gameWon = true
 						showWin();
 						return;
 					}
@@ -3784,7 +3861,7 @@
 			} else {	// Si es el modo de juego infinito
 				// Comprobar si hay naves enemigas activas
 				const isShipActive = enemies.length > 0 || laserShips.length > 0 || fractalShips.length > 0;
-				
+
 				// Comprobar si hay satélites activos
 				const isSatelliteActive = satellites.length > 0 || blindSatellites.length > 0 || absorberSatellites.length > 0;
 
@@ -3800,7 +3877,7 @@
 						nextShipSpawnTime = null; // Reinicia el temporizador
 					}
 				}
-				
+
 				// Lógica de aparición de SATÉLITES
 				if (!isSatelliteActive) {
 					if (!nextSatelliteSpawnTime) {
@@ -3818,7 +3895,7 @@
 			// LIMPIA (borra un área rectangular específica del lienzo, estableciendo 
 			// los píxeles dentro de ese rectángulo a transparente negro (rgba(0, 0, 0, 0))
 			// Todos los "draw" (dibujar elementos, deben hacerse después de esto o se borrarán)
-			ctx.clearRect(0,0,canvas.width,canvas.height);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Dibujar estrellas de fondo
 			drawStars();
@@ -3828,7 +3905,7 @@
 			drawPlayer();
 
 			// Crear los bonus
-			if(Math.random()<levels[currentLevel].rockRate){ 
+			if (Math.random() < levels[currentLevel].rockRate) {
 				spawnRock();
 			}
 			spawnBonus();
@@ -3849,11 +3926,11 @@
 
 			if (isInfiniteMode) {	//Modo infinito
 				// MODO INFINITO: Mueve y dibuja todos los tipos de enemigos posibles.
-				
+
 				// Cometas (ya que pueden aparecer)
 				if (Math.random() < levels[currentLevel].cometRate) spawnComet();
 				drawComets();
-				
+
 				// Naves enemigas básicas
 				moveEnemies();
 				updateEnemyShooting();
@@ -3872,7 +3949,7 @@
 				updateFractalBullets();
 				drawFractalShips();
 				drawFractalBullets();
-				
+
 				// Satélite paralizador
 				moveSatellite();
 				updateWaveShooting();
@@ -3899,7 +3976,7 @@
 				}
 
 				// Solo a partir del Nivel 5 (índice 4)
-				if(currentLevel >= 4){
+				if (currentLevel >= 4) {
 					if (Math.random() < levels[currentLevel].cometRate) {
 						spawnComet();
 					}
@@ -3908,22 +3985,22 @@
 
 
 				// Nivel 6 (índice 5) → naves láser
-				if (currentLevel === 5){
+				if (currentLevel === 5) {
 					moveLaserShips();
 					updateLaserFiring();
 					drawLaserShips();
 					drawLaserBeams();
 				}
-				
+
 				// Nivel 7 (índice 6) → nave fractal
-				if (currentLevel === 6){
+				if (currentLevel === 6) {
 					moveFractalShips();
 					updateFractalShooting();
-					updateFractalBullets(); 
+					updateFractalBullets();
 					drawFractalShips();
 					drawFractalBullets();
 				}
-							
+
 				// Nivel 8 (índice 7) → satélite paralizador
 				if (currentLevel === 7) {
 					spawnSatellite();	// crea satélites
@@ -3959,11 +4036,11 @@
 
 					moveFractalShips();
 					updateFractalShooting();
-					updateFractalBullets(); 
+					updateFractalBullets();
 					drawFractalShips();
 					drawFractalBullets();
 				}
-				
+
 				if (currentLevel === 10) {  // Nivel 11 - Final (índice 10)
 					spawnMirrorShip();
 					moveMirrorShip();
@@ -3990,7 +4067,7 @@
 		}
 
 		// ===== Inicialización =====
-		player.x = canvas.width/2 - player.w/2;
+		player.x = canvas.width / 2 - player.w / 2;
 		player.y = canvas.height - player.h - 20;
 		updateLivesDisplay();
 		updateHUD();
@@ -4005,7 +4082,7 @@
 		refreshInfiniteButton();
 		// Al cargar, mostramos primero el menú principal:
 		showMainMenu();
-  	</script>
+	</script>
 </body>
-</html>
 
+</html>
